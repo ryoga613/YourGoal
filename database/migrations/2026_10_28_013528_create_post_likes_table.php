@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -29,19 +28,7 @@ return new class extends Migration
         });
 
         // "knowledge_post_id" or "goal_post_id" or "progress_report_id" or "achievement_report_id"
-        // 上記のいずれかに合計１つ値が入っている必要があること
-
-        DB::statement('
-                ALTER TABLE post_likes
-                ADD CONSTRAINT chk_post_likes_target
-                CHECK (
-                    (knowledge_post_id IS NOT NULL) +
-                    (goal_post_id IS NOT NULL) +
-                    (progress_report_id IS NOT NULL) +
-                    (achievement_report_id IS NOT NULL)
-                    = 1
-                )
-            ');
+        // 上記のいずれかに合計１つ値が入っている必要があることはformRequestで確認
     }
 
     /**
