@@ -17,11 +17,8 @@ return new class extends Migration
             $table->foreignId('comment_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            // 同じ投稿には複数回いいねできない
-            $table->unique(['user_id', 'knowledge_post_id']);
-            $table->unique(['user_id', 'goal_post_id']);
-            $table->unique(['user_id', 'progress_report_id']);
-            $table->unique(['user_id', 'achievement_report_id']);
+            // 同じコメントには複数回いいねできない
+            $table->unique(['user_id', 'comment_id']);
         });
     }
 
