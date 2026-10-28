@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -24,19 +23,8 @@ return new class extends Migration
             $table->timestamps();
         });
         // "knowledge_post_id" or "goal_post_id" or "progress_report_id" or "achievement_report_id"
-        // 上記のいずれかに値が入っている必要があること
+        // 上記のいずれかに値が入っている必要があることをformRequestで確認
 
-        DB::statement('
-                ALTER TABLE comments
-                ADD CONSTRAINT chk_comments_target
-                CHECK (
-                    (knowledge_post_id IS NOT NULL) +
-                    (goal_post_id IS NOT NULL) +
-                    (progress_report_id IS NOT NULL) +
-                    (achievement_report_id IS NOT NULL)
-                    = 1
-                )
-            ');
     }
 
     /**

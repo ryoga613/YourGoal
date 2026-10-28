@@ -35,7 +35,7 @@ class PostLike extends Model
         return $this->belongsTo(AchievementReport::class);
     }
 
-    public function knowledge_reports(): BelongsTo
+    public function knowledge_post(): BelongsTo
     {
         return $this->belongsTo(KnowledgePost::class);
     }

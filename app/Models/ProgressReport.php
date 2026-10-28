@@ -23,11 +23,11 @@ class ProgressReport extends Model
 
     public function post_likes(): HasMany
     {
-        return $this->HasMany(PostLike::class, 'progress_report_id');
+        return $this->hasMany(PostLike::class, 'progress_report_id');
     }
 
     public function comments(): HasMany
     {
-        return $this->HasMany(Comment::class);
+        return $this->hasMany(Comment::class);
     }
 }
