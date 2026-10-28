@@ -20,12 +20,18 @@ return new class extends Migration
             $table->foreignId('progress_report_id')->nullable()->constrained('progress_reports')->cascadeOnDelete();
             $table->foreignId('achievement_report_id')->nullable()->constrained('achievement_reports')->cascadeOnDelete();
             $table->timestamps();
+
+            // 同じ投稿には複数回いいねできない
+            $table->unique(['user_id', 'knowledge_post_id']);
+            $table->unique(['user_id', 'goal_post_id']);
+            $table->unique(['user_id', 'progress_report_id']);
+            $table->unique(['user_id', 'achievement_report_id']);
         });
 
-        // "knowledge_post_id" or "goal_post_id" or "progress_report_id" or "achievement_report_id" 
-            // 上記のいずれかに合計１つ値が入っている必要があること
+        // "knowledge_post_id" or "goal_post_id" or "progress_report_id" or "achievement_report_id"
+        // 上記のいずれかに合計１つ値が入っている必要があること
 
-            DB::statement('
+        DB::statement('
                 ALTER TABLE post_likes
                 ADD CONSTRAINT chk_post_likes_target
                 CHECK (
