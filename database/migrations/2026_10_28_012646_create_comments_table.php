@@ -23,9 +23,9 @@ return new class extends Migration
             $table->text('body');
             $table->timestamps();
         });
-           // "knowledge_post_id" or "goal_post_id" or "progress_report_id" or "achievement_report_id" 
-            // 上記のいずれかに値が入っている必要があること
-            
+        // "knowledge_post_id" or "goal_post_id" or "progress_report_id" or "achievement_report_id"
+        // 上記のいずれかに値が入っている必要があること
+
         DB::statement('
                 ALTER TABLE comments
                 ADD CONSTRAINT chk_comments_target
