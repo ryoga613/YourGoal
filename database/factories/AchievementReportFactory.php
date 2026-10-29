@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\AchievementReport;
 use App\Models\GoalPost;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,8 +20,9 @@ class AchievementReportFactory extends Factory
     {
 
         return [
-            'user_id' => User::factory(),
             'goal_post_id' => GoalPost::factory(),
+            // 報告者は紐づく目標の投稿者と同じユーザーにする
+            'user_id' => fn (array $attributes) => GoalPost::find($attributes['goal_post_id'])->user_id,
             'title' => fake()->sentence(),
             'body' => fake()->text(),
             'image_path' => fake()->imageUrl(640, 480, 'cats', true),

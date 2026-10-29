@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\AchievementReport;
-use App\Models\PostLike;
 use App\Models\GoalPost;
 use App\Models\KnowledgePost;
+use App\Models\PostLike;
 use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,7 +22,7 @@ class PostLikeFactory extends Factory
      */
     public function definition(): array
     {
-         // 紐づけ先の候補となるファクトリー（または null）を定義
+        // 紐づけ先の候補となるファクトリー（または null）を定義
         // ここで「どれか1つだけランダムに選ぶ」仕組みを作ります
         $relations = [
             'knowledge_post_id' => KnowledgePost::factory(),

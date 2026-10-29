@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'profile_image_path' => fake()->imageUrl(640, 480, 'cats', true),
             'bio' => fake()->text(),
-            'role' => fake()->randomElement(['admin', 'user']),
+            'role' => 'user',
             'remember_token' => Str::random(10),
         ];
     }
@@ -43,6 +43,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
         ]);
     }
 }
