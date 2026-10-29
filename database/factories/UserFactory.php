@@ -29,9 +29,9 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'profile_image_path' => fake()->imageUrl(640, 480, 'cats', true),
+            'profile_image_path' => 'https://picsum.photos/seed/'.fake()->uuid().'/640/480',
             'bio' => fake()->text(),
-            'role' => fake()->randomElement(['admin', 'user']),
+            'role' => 'user',
             'remember_token' => Str::random(10),
         ];
     }
@@ -43,6 +43,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
         ]);
     }
 }

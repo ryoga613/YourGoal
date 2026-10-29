@@ -2,12 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\AchievementReport;
 use App\Models\Comment;
-use App\Models\GoalPost;
-use App\Models\KnowledgePost;
-use App\Models\ProgressReport;
 use App\Models\User;
+use Database\Factories\Concerns\BelongsToPost;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class CommentFactory extends Factory
 {
+    use BelongsToPost;
+
     /**
      * Define the model's default state.
      *
@@ -22,26 +21,22 @@ class CommentFactory extends Factory
      */
     public function definition(): array
     {
-        // 紐づけ先の候補となるファクトリー（または null）を定義
-        // ここで「どれか1つだけランダムに選ぶ」仕組みを作ります
-        $relations = [
-            'knowledge_post_id' => KnowledgePost::factory(),
-            'goal_post_id' => GoalPost::factory(),
-            'progress_report_id' => ProgressReport::factory(),
-            'achievement_report_id' => AchievementReport::factory(),
-        ];
-        $selectedKey = array_rand($relations);
-
         return [
             'user_id' => User::factory(),
-            'knowledge_post_id' => $selectedKey === 'knowledge_post_id' ? KnowledgePost::factory() : null,
-            'goal_post_id' => $selectedKey === 'goal_post_id' ? GoalPost::factory() : null,
-            'progress_report_id' => $selectedKey === 'progress_report_id' ? ProgressReport::factory() : null,
-            'achievement_report_id' => $selectedKey === 'achievement_report_id' ? AchievementReport::factory() : null,
-            'parent_id' => null, // 返信コメントなどで使う場合は必要に応じて調整
+            ...$this->randomPostAttributes(),
+            'parent_id' => null,
             'body' => fake()->text(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
+    }
+
+    /**
+     * 指定したコメントへの返信にする（紐づけ先の投稿は親コメントと同じにする）
+     */
+    public function replyTo(Comment $parent): static
+    {
+        return $this->state(fn (array $attributes) => [
+            ...$parent->only(self::POST_FOREIGN_KEYS),
+            'parent_id' => $parent->id,
+        ]);
     }
 }
