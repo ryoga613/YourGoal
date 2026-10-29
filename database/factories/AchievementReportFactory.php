@@ -19,16 +19,16 @@ class AchievementReportFactory extends Factory
      */
     public function definition(): array
     {
-    
-            return [
-            'user_id'=> User::factory(),
-            'goal_post_id'=> GoalPost::factory(),
-            'title'=>fake()->sentence(),
-            'body'=>fake()->text(),
-            'image_path'=>fake()->imageUrl(640, 480, 'cats', true),
-            'created_at'=>now(),
-            'updated_at'=>now()
-    
+
+        return [
+            'user_id' => User::factory(),
+            'goal_post_id' => GoalPost::factory(),
+            'title' => fake()->sentence(),
+            'body' => fake()->text(),
+            'image_path' => fake()->imageUrl(640, 480, 'cats', true),
+            'created_at' => now(),
+            'updated_at' => now(),
+
         ];
     }
 }
