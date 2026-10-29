@@ -24,9 +24,7 @@ class ProgressReportFactory extends Factory
             'user_id' => fn (array $attributes) => GoalPost::find($attributes['goal_post_id'])->user_id,
             'title' => fake()->sentence(),
             'body' => fake()->text(),
-            'image_path' => fake()->imageUrl(640, 480, 'cats', true),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'image_path' => 'https://picsum.photos/seed/'.fake()->uuid().'/640/480',
         ];
     }
 }

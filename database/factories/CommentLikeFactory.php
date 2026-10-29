@@ -22,8 +22,6 @@ class CommentLikeFactory extends Factory
         return [
             'user_id' => User::factory(),
             'comment_id' => Comment::factory(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
     }
 }

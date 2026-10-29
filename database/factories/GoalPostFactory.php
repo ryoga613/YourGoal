@@ -23,9 +23,7 @@ class GoalPostFactory extends Factory
             'title' => fake()->sentence(),
             'body' => fake()->text(),
             'status' => fake()->randomElement(['considering', 'in_progress', 'achieved', 'cancelled']),
-            'image_path' => fake()->imageUrl(640, 480, 'cats', true),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'image_path' => 'https://picsum.photos/seed/'.fake()->uuid().'/640/480',
         ];
     }
 }
