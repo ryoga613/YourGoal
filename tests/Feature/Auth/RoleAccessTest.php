@@ -12,28 +12,28 @@ class RoleAccessTest extends TestCase
 
     public function test_guest_is_redirected_to_login(): void
     {
-        $this->get('/home')->assertRedirect(route('login'));
-        $this->get('/admin/dashboard')->assertRedirect(route('login'));
+        $this->get('/')->assertRedirect(route('login'));
+        $this->get('/admin')->assertRedirect(route('login'));
     }
 
     public function test_general_user_can_access_home(): void
     {
-        $this->actingAs(User::factory()->create())->get('/home')->assertOk();
+        $this->actingAs(User::factory()->create())->get('/')->assertOk();
     }
 
     public function test_general_user_can_not_access_admin_pages(): void
     {
-        $this->actingAs(User::factory()->create())->get('/admin/dashboard')->assertForbidden();
+        $this->actingAs(User::factory()->create())->get('/admin')->assertForbidden();
     }
 
     public function test_admin_can_access_admin_dashboard(): void
     {
-        $this->actingAs(User::factory()->admin()->create())->get('/admin/dashboard')->assertOk();
+        $this->actingAs(User::factory()->admin()->create())->get('/admin')->assertOk();
     }
 
     public function test_admin_can_not_access_general_user_pages(): void
     {
-        $this->actingAs(User::factory()->admin()->create())->get('/home')->assertForbidden();
+        $this->actingAs(User::factory()->admin()->create())->get('/')->assertForbidden();
     }
 
     public function test_authenticated_user_visiting_login_is_redirected_to_role_home(): void
