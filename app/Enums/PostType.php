@@ -2,6 +2,11 @@
 
 namespace App\Enums;
 
+use App\Models\AchievementReport;
+use App\Models\GoalPost;
+use App\Models\KnowledgePost;
+use App\Models\ProgressReport;
+
 /**
  * 投稿の種類（/posts/{type}/{id} の type の値）
  */
@@ -45,6 +50,21 @@ enum PostType: string
             self::Progress => 'progress_report',
             self::Achievement => 'achievement_report',
             self::Knowledge => 'knowledge_post',
+        };
+    }
+
+    /**
+     * 投稿のモデルクラス
+     *
+     * @return class-string<GoalPost|ProgressReport|AchievementReport|KnowledgePost>
+     */
+    public function modelClass(): string
+    {
+        return match ($this) {
+            self::Goal => GoalPost::class,
+            self::Progress => ProgressReport::class,
+            self::Achievement => AchievementReport::class,
+            self::Knowledge => KnowledgePost::class,
         };
     }
 
