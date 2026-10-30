@@ -25,7 +25,7 @@ class CommentFactory extends Factory
             'user_id' => User::factory(),
             ...$this->randomPostAttributes(),
             'parent_id' => null,
-            'body' => fake()->text(),
+            'body' => fake('ja_JP')->realText(),
         ];
     }
 
