@@ -38,7 +38,15 @@
     <div class="top-actions">
         <a class="icon-link" href="#" aria-label="通知">♧</a>
         @auth
-            <a href="{{ \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : url('/profile/edit') }}" class="avatar" aria-label="プロフィール">{{ mb_substr(auth()->user()->name ?? 'U', 0, 1) }}</a>
+            @if(auth()->user()->isAdmin())
+                <a class="btn btn-light" href="{{ route('admin.dashboard') }}">管理画面</a>
+            @else
+                <a href="{{ \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : url('/profile/edit') }}" class="avatar" aria-label="プロフィール">{{ mb_substr(auth()->user()->name ?? 'U', 0, 1) }}</a>
+            @endif
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="btn btn-outline" type="submit">ログアウト</button>
+            </form>
         @else
             <a class="btn btn-light" href="{{ \Illuminate\Support\Facades\Route::has('login') ? route('login') : url('/login') }}">ログイン</a>
         @endauth
@@ -46,5 +54,31 @@
 </header>
 @yield('content')
 <footer class="footer">© {{ date('Y') }} Growly — 小さな一歩を、みんなの成長に。</footer>
+<script>
+    // ブラウザ標準の入力チェック（required / type="email" / minlength）のメッセージを日本語で統一する
+    document.addEventListener('invalid', (event) => {
+        const input = event.target;
+        const label = document.querySelector(`label[for="${input.id}"]`)?.textContent.trim() || 'この項目';
+        const { validity } = input;
+
+        let message = '';
+        if (validity.valueMissing) {
+            message = `${label}を入力してください。`;
+        } else if (validity.typeMismatch && input.type === 'email') {
+            message = 'メールアドレスの形式で入力してください。（例：name@example.com）';
+        } else if (validity.tooShort) {
+            message = `${label}は${input.minLength}文字以上で入力してください。`;
+        }
+
+        input.setCustomValidity(message);
+    }, true);
+
+    // 入力し直したらメッセージをリセットし、改めてチェックさせる
+    document.addEventListener('input', (event) => {
+        if (event.target.setCustomValidity) {
+            event.target.setCustomValidity('');
+        }
+    });
+</script>
 </body>
 </html>
