@@ -94,12 +94,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/comments', [Admin\CommentController::class, 'index'])->name('comments.index');
     Route::get('/comments/{comment}', [Admin\CommentController::class, 'show'])->name('comments.show');
     Route::delete('/comments/{comment}', [Admin\CommentController::class, 'destroy'])->name('comments.destroy');
-
-    // ジャンル管理
-    Route::get('/genres', [Admin\GenreController::class, 'index'])->name('genres.index');
-    Route::get('/genres/create', [Admin\GenreController::class, 'create'])->name('genres.create');
-    Route::post('/genres', [Admin\GenreController::class, 'store'])->name('genres.store');
-    Route::get('/genres/{genre}/edit', [Admin\GenreController::class, 'edit'])->name('genres.edit');
-    Route::patch('/genres/{genre}', [Admin\GenreController::class, 'update'])->name('genres.update');
-    Route::delete('/genres/{genre}', [Admin\GenreController::class, 'destroy'])->name('genres.destroy');
 });
