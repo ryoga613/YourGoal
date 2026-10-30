@@ -30,11 +30,14 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="{{ \Illuminate\Support\Facades\Route::has('home') ? route('home') : url('/') }}"><span class="brand-mark">G</span>growly</a>
+    <a class="brand" href="{{ auth()->check() ? auth()->user()->role->homePath() : route('login') }}"><span class="brand-mark">G</span>growly</a>
+    {{-- 検索は一般ユーザー向けの機能のため、管理者には表示しない --}}
+    @unless(auth()->user()?->isAdmin())
     <form class="top-search" method="GET" action="{{ \Illuminate\Support\Facades\Route::has('posts.search') ? route('posts.search') : url('/search') }}">
         <span class="search-icon">⌕</span>
         <input type="search" name="keyword" value="{{ request('keyword') }}" placeholder="気になる投稿やジャンルを検索">
     </form>
+    @endunless
     <div class="top-actions">
         <a class="icon-link" href="#" aria-label="通知">♧</a>
         @auth
