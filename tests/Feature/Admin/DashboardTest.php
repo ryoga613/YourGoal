@@ -25,6 +25,8 @@ class DashboardTest extends TestCase
         AchievementReport::factory()->for($goalPosts->first(), 'goal_post')->create();
         $knowledgePost = KnowledgePost::factory()->recycle($users)->create();
         Comment::factory(4)->forPost($knowledgePost)->recycle($users)->create();
+        // 昨日のコメントは今日のコメント数に含めない
+        Comment::factory()->forPost($knowledgePost)->recycle($users)->create(['created_at' => now()->subDay()]);
 
         $this->actingAs($admin)
             ->get(route('admin.dashboard'))
@@ -32,7 +34,7 @@ class DashboardTest extends TestCase
             ->assertViewHas('userCount', 3)
             ->assertViewHas('postCount', 7)
             ->assertViewHas('postCounts', ['目標宣言' => 2, '進捗報告' => 3, '達成報告' => 1, '学び共有' => 1])
-            ->assertViewHas('commentCount', 4)
+            ->assertViewHas('todayCommentCount', 4)
             ->assertSee('管理者ダッシュボード')
             ->assertDontSee('気になる投稿やジャンルを検索');
     }
