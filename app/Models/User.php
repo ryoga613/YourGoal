@@ -88,4 +88,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(CommentLike::class);
     }
+
+    public function postCount()
+    {
+        // 全種類の投稿の数の合計
+        return $this->goal_posts_count
+         + $this->progress_reports_count
+         + $this->achievement_reports_count
+         + $this->knowledge_posts_count;
+
+    }
+
+    // public function total()
+    // {
+    //     return $this->count();
+    // }
+
 }

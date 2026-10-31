@@ -6,10 +6,13 @@ use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCommentIndexRequest;
 use App\Models\Comment;
+use App\Support\EscapeLike;
 use Illuminate\Database\Eloquent\Builder;
 
 class CommentController extends Controller
 {
+    use EscapeLike;
+
     /**
      * 一覧表示時に読み込むリレーション（コメント先の投稿は4種類すべてを読み込む）
      */
@@ -80,13 +83,5 @@ class CommentController extends Controller
         return redirect()
             ->route('admin.comments.index')
             ->with('status', 'コメントを削除しました。');
-    }
-
-    /**
-     * LIKE検索で % と _ をワイルドカードではなく文字として扱うようにエスケープする
-     */
-    private function escapeLike(string $value): string
-    {
-        return addcslashes($value, '\\%_');
     }
 }

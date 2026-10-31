@@ -9,10 +9,13 @@ use App\Models\AchievementReport;
 use App\Models\GoalPost;
 use App\Models\KnowledgePost;
 use App\Models\ProgressReport;
+use App\Support\EscapeLike;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class PostController extends Controller
 {
+    use EscapeLike;
+
     /**
      * 一覧・詳細で数える関連データ
      */
@@ -134,13 +137,5 @@ class PostController extends Controller
             ->with('user')
             ->withCount(self::COUNT_RELATIONS)
             ->findOrFail($id);
-    }
-
-    /**
-     * LIKE検索で % と _ をワイルドカードではなく文字として扱うようにエスケープする
-     */
-    private function escapeLike(string $value): string
-    {
-        return addcslashes($value, '\\%_');
     }
 }
