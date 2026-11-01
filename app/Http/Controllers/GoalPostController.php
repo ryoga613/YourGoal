@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\GoalPostStatus;
+use App\Http\Requests\StoreUserGoalPostRequest;
 use App\Models\GoalPost;
-use Illuminate\Http\Request;
 
 class GoalPostController extends Controller
 {
@@ -12,15 +13,27 @@ class GoalPostController extends Controller
      */
     public function create()
     {
-        //
+        return view('goals.create');
     }
 
     /**
      * 目標を作成し初期状態を挑戦中にする
      */
-    public function store(Request $request)
+    public function store(StoreUserGoalPostRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $data = [
+            'title' => $validated['title'],
+            'body' => $validated['body'] ?? null,
+            'image_path' => $request->file('image')?->store('goal_images', 'public'),
+            'user_id' => auth()->id(),
+            'status' => GoalPostStatus::InProgress,
+        ];
+
+        $goal = GoalPost::create($data);
+
+        return redirect()->route('goals.show', $goal);
     }
 
     /**
@@ -28,6 +41,8 @@ class GoalPostController extends Controller
      */
     public function show(GoalPost $goal)
     {
-        //
+        $goal->loadCount(['post_likes', 'comments']);
+
+        return view('goals.show', compact('goal'));
     }
 }
