@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminUserIndexRequest;
 use App\Models\User;
@@ -18,13 +19,12 @@ class UserController extends Controller
     {
         $validated = $request->validated();
         $keyword = $validated['keyword'] ?? null;
-        $userQuery = User::where('role', 'user')->withCount(['goal_posts', 'progress_reports', 'achievement_reports', 'knowledge_posts', 'comments'])
-            ->latest();
-        // $postCount = $userQuery as ->postCount
+        $userQuery = User::where('role', UserRole::User)->withCount(['goal_posts', 'progress_reports', 'achievement_reports', 'knowledge_posts', 'comments'])
+            ->latest()->latest('id');
 
         if ($keyword) {
             $userQuery->where(function ($query) use ($keyword) {
-                $query->Where('email', 'like', '%'.$this->escapeLike($keyword).'%')
+                $query->where('email', 'like', '%'.$this->escapeLike($keyword).'%')
                     ->orWhere('name', 'like', '%'.$this->escapeLike($keyword).'%');
             });
         }
