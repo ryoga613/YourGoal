@@ -48,7 +48,10 @@
             <div class="composer" style="flex-wrap:wrap">
                 <strong style="width:100%">次の一歩を記録しよう</strong>
                 <a class="btn btn-light" href="{{ route('progress-reports.create', $goal) }}">＋ 進捗を報告</a>
-                <a class="btn btn-primary" href="{{ route('achievement-reports.create', $goal) }}">✓ 達成を報告</a>
+                {{-- 達成済みの目標には、もう達成報告できないようにする --}}
+                @if($goal->status !== \App\Enums\GoalPostStatus::Achieved)
+                    <a class="btn btn-primary" href="{{ route('achievement-reports.create', $goal) }}">✓ 達成を報告</a>
+                @endif
             </div>
         @endif
 
