@@ -23,9 +23,9 @@ class StoreProgressReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required_without_all:body,image','nullable','string','max:255'],
-            'body' => ['required_without_all:title,image','nullable','string','max:1000'],
-            'image' => ['required_without_all:body,title','nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'title' => ['required_without_all:body,image', 'nullable', 'string', 'max:255'],
+            'body' => ['required_without_all:title,image', 'nullable', 'string', 'max:1000'],
+            'image' => ['required_without_all:body,title', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
@@ -42,8 +42,8 @@ class StoreProgressReportRequest extends FormRequest
             'image.mimes' => '画像はjpg・png・webp形式でアップロードしてください。',
             'image.max' => '画像は2MB以下にしてください。',
 
-            'title.required_without_all'      => 'タイトル・本文・画像のいずれかを入力してください。',
-            'body.required_without_all'       => 'タイトル・本文・画像のいずれかを入力してください。',
+            'title.required_without_all' => 'タイトル・本文・画像のいずれかを入力してください。',
+            'body.required_without_all' => 'タイトル・本文・画像のいずれかを入力してください。',
             'image.required_without_all' => 'タイトル・本文・画像のいずれかを入力してください。',
         ];
     }

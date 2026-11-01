@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Enums\GoalPostStatus;
+use App\Models\AchievementReport;
+use App\Models\GoalPost;
+use App\Models\KnowledgePost;
+use App\Models\ProgressReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,7 +31,25 @@ class PostController extends Controller
      */
     public function show(string $type, int $id)
     {
-        //
+        if ($type === 'goal') {
+            $post = GoalPost::with('user', 'comments.user')
+                ->withCount(['post_likes', 'comments'])
+                ->findOrFail($id);
+        } elseif ($type === 'progress') {
+            $post = ProgressReport::with('user', 'comments.user')
+                ->withCount(['post_likes', 'comments'])
+                ->findOrFail($id);
+        } elseif ($type === 'achievement') {
+            $post = AchievementReport::with('user', 'comments.user')
+                ->withCount(['post_likes', 'comments'])
+                ->findOrFail($id);
+        } elseif ($type === 'knowledge') {
+            $post = KnowledgePost::with('user', 'comments.user')
+                ->withCount(['post_likes', 'comments'])
+                ->findOrFail($id);
+        }
+
+        return view('posts.show', compact('post'));
     }
 
     /**

@@ -15,7 +15,7 @@ class ProgressReportController extends Controller
      */
     public function create(GoalPost $goal)
     {
-        return view('progress-reports.create',compact('goal'));
+        return view('progress-reports.create', compact('goal'));
     }
 
     /**
