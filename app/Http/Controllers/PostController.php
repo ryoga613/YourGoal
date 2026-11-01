@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\GoalPostStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -11,7 +13,13 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        // 進捗・達成報告は目標を選んでから書くので、まだ達成・中止していない自分の目標を渡す
+        $goals = Auth::user()->goal_posts()
+            ->whereIn('status', [GoalPostStatus::Considering, GoalPostStatus::InProgress])
+            ->latest()
+            ->get();
+
+        return view('posts.create', compact('goals'));
     }
 
     /**
