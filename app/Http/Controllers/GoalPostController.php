@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\GoalPostStatus;
 use App\Http\Requests\StoreUserGoalPostRequest;
 use App\Models\GoalPost;
+use Illuminate\Support\Facades\Auth;
 
 class GoalPostController extends Controller
 {
@@ -27,7 +28,7 @@ class GoalPostController extends Controller
             'title' => $validated['title'],
             'body' => $validated['body'] ?? null,
             'image_path' => $request->file('image')?->store('goal_images', 'public'),
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'status' => GoalPostStatus::InProgress,
         ];
 
