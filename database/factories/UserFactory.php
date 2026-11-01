@@ -30,7 +30,8 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'profile_image_path' => 'https://picsum.photos/seed/'.fake()->uuid().'/640/480',
+            // サンプル画像を用意するまでは未設定にし、アバターは名前の頭文字で表示する
+            'profile_image_path' => null,
             'bio' => fake()->text(),
             'role' => UserRole::User,
             'remember_token' => Str::random(10),
