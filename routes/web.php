@@ -54,6 +54,7 @@ Route::middleware(['auth', 'general'])->group(function () {
 
     // 学び・知識共有
     Route::get('/knowledge-posts/create', [KnowledgePostController::class, 'create'])->name('knowledge-posts.create');
+    Route::get('/knowledge-posts/{knowledge}', [KnowledgePostController::class, 'show'])->name('knowledge-posts.show');
     Route::post('/knowledge-posts', [KnowledgePostController::class, 'store'])->name('knowledge-posts.store');
 
     // いいね
