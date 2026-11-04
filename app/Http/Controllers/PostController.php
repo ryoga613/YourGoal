@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\GoalPostStatus;
-use App\Models\AchievementReport;
-use App\Models\GoalPost;
-use App\Models\KnowledgePost;
-use App\Models\ProgressReport;
+use App\Enums\PostType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,25 +28,19 @@ class PostController extends Controller
      */
     public function show(string $type, int $id)
     {
-        if ($type === 'goal') {
-            $post = GoalPost::with('user', 'comments.user')
-                ->withCount(['post_likes', 'comments'])
-                ->findOrFail($id);
-        } elseif ($type === 'progress') {
-            $post = ProgressReport::with('user', 'comments.user')
-                ->withCount(['post_likes', 'comments'])
-                ->findOrFail($id);
-        } elseif ($type === 'achievement') {
-            $post = AchievementReport::with('user', 'comments.user')
-                ->withCount(['post_likes', 'comments'])
-                ->findOrFail($id);
-        } elseif ($type === 'knowledge') {
-            $post = KnowledgePost::with('user', 'comments.user')
-                ->withCount(['post_likes', 'comments'])
-                ->findOrFail($id);
-        }
+        // コメントは返信も含めて古い順にまとめて取得し、画面側で親子に組み立てる
+        $post = PostType::from($type)->modelClass()::with([
+            'user',
+            'comments' => fn ($query) => $query->with('user')->oldest()->oldest('id'),
+        ])
+            ->withCount(['post_likes', 'comments'])
+            ->findOrFail($id);
 
-        return view('posts.show', compact('post'));
+        return view('posts.show', [
+            'post' => $post,
+            // 親コメントのIDごとの返信一覧（キーが 0 のグループが投稿への直接のコメント）
+            'commentsByParent' => $post->comments->groupBy(fn ($comment) => $comment->parent_id ?? 0),
+        ]);
     }
 
     /**

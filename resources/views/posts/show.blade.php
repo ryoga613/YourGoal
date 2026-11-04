@@ -12,16 +12,21 @@
             @if(data_get($post,'image_path'))<img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">@endif
             <div class="post-footer"><button class="post-action" type="button">♡ {{  $post->post_likes_count }} いいね</button><span>♧ {{ data_get($post,'comments_count',0) }} コメント</span></div>
         </article>
-        <section class="form-card">
+        <section class="form-card" id="comments">
+            @if (session('status'))<div class="flash">{{ session('status') }}</div>@endif
             <h2 style="font-size:17px;margin-top:0">コメントする</h2>
-            <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('comments.store') ? route('comments.store', ['type'=>request()->route('type'),'id'=>request()->route('id')]) : '#' }}">
+            <form method="POST" action="{{ route('comments.store', ['type' => request()->route('type'), 'id' => $post->id]) }}">
                 @csrf
-                <div class="form-group"><textarea class="form-control" name="body" rows="3" placeholder="応援や感想をコメントしよう" required>{{ old('body') }}</textarea>@error('body')<div class="form-error">{{ $message }}</div>@enderror</div>
+                <div class="form-group">
+                    {{-- 返信・編集フォームで失敗したときの入力値は、そちらのフォームに戻す --}}
+                    <textarea class="form-control" name="body" rows="3" maxlength="1000" placeholder="応援や感想をコメントしよう" required>{{ old('reply_to') || old('editing') ? '' : old('body') }}</textarea>
+                    @error('body')<div class="form-error">{{ $message }}</div>@enderror
+                </div>
                 <div class="form-actions"><button class="btn btn-primary" type="submit">コメントを投稿</button></div>
             </form>
             <h3 style="font-size:15px;margin-top:26px">みんなのコメント</h3>
-            @forelse(($post->comments ?? []) as $comment)
-                <div style="display:flex;gap:10px;padding:14px 0;border-top:1px solid var(--line)"><div class="avatar">{{ mb_substr(data_get($comment,'user.name','U'),0,1) }}</div><div><strong>{{ data_get($comment,'user.name','ユーザー') }}</strong><div class="post-meta">{{ data_get($comment,'created_at') }}</div><p style="margin:7px 0">{{ data_get($comment,'body') }}</p></div></div>
+            @forelse ($commentsByParent->get(0, collect()) as $comment)
+                @include('posts._comment', ['comment' => $comment, 'depth' => 0])
             @empty
                 <p class="post-meta">まだコメントはありません。最初のコメントを投稿してみましょう。</p>
             @endforelse
