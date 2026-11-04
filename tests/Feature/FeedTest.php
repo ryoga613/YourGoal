@@ -1,0 +1,29 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\GoalPost;
+use App\Models\KnowledgePost;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class FeedTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_each_post_is_shown_once_with_link_to_its_type(): void
+    {
+        $goal = GoalPost::factory()->create(['title' => 'ホームの目標']);
+        $knowledge = KnowledgePost::factory()->create(['title' => 'ホームの学び']);
+
+        $response = $this->actingAs(User::factory()->create())
+            ->get(route('home', ['sort' => 'latest']))
+            ->assertOk()
+            ->assertSee(route('posts.show', ['type' => 'goal', 'id' => $goal->id]), false)
+            ->assertSee(route('posts.show', ['type' => 'knowledge', 'id' => $knowledge->id]), false);
+
+        // 同じ投稿が2回表示されていないこと
+        $this->assertSame(1, substr_count($response->getContent(), 'ホームの目標'));
+    }
+}
