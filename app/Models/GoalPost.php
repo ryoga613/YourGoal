@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\GoalPostStatus;
+use App\Enums\PostType;
 use Database\Factories\GoalPostFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,14 @@ class GoalPost extends Model
 {
     /** @use HasFactory<GoalPostFactory> */
     use HasFactory;
+
+    /**
+     * この投稿の種類（$post->type という属性名と衝突しないよう postType という名前にしている）
+     */
+    public function postType(): PostType
+    {
+        return PostType::Goal;
+    }
 
     protected function casts(): array
     {

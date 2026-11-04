@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PostType;
 use Database\Factories\AchievementReportFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,14 @@ class AchievementReport extends Model
 {
     /** @use HasFactory<AchievementReportFactory> */
     use HasFactory;
+
+    /**
+     * この投稿の種類（$post->type という属性名と衝突しないよう postType という名前にしている）
+     */
+    public function postType(): PostType
+    {
+        return PostType::Achievement;
+    }
 
     public function user(): BelongsTo
     {
