@@ -40,8 +40,10 @@ class CommentTest extends TestCase
     {
         $taro = User::factory()->create(['name' => '山田太郎']);
         Comment::factory()->for($taro)->create(['body' => '最初のコメント']);
-        Comment::factory()->create(['body' => '英語の勉強がんばります']);
-        Comment::factory()->create(['body' => '関係ないコメント']);
+        // 投稿者名がランダムだと「山田」さんになることがあり、名前検索で誤ってヒットするので名前を固定する
+        $other = User::factory()->create(['name' => '佐藤花子']);
+        Comment::factory()->for($other)->create(['body' => '英語の勉強がんばります']);
+        Comment::factory()->for($other)->create(['body' => '関係ないコメント']);
 
         $this->actingAs($this->admin)
             ->get(route('admin.comments.index', ['keyword' => '英語']))
