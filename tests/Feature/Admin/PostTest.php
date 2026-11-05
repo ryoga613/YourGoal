@@ -56,9 +56,11 @@ class PostTest extends TestCase
     {
         $taro = User::factory()->create(['name' => '山田太郎']);
         GoalPost::factory()->for($taro)->create(['title' => '太郎の目標']);
-        KnowledgePost::factory()->create(['title' => '英語の学び', 'body' => '単語帳']);
-        KnowledgePost::factory()->create(['title' => '本文で検索', 'body' => '英語の勉強方法']);
-        GoalPost::factory()->create(['title' => '関係ない投稿', 'body' => '関係ない本文']);
+        // 投稿者名がランダムだと「山田」さんになることがあり、名前検索で誤ってヒットするので名前を固定する
+        $other = User::factory()->create(['name' => '佐藤花子']);
+        KnowledgePost::factory()->for($other)->create(['title' => '英語の学び', 'body' => '単語帳']);
+        KnowledgePost::factory()->for($other)->create(['title' => '本文で検索', 'body' => '英語の勉強方法']);
+        GoalPost::factory()->for($other)->create(['title' => '関係ない投稿', 'body' => '関係ない本文']);
 
         $this->actingAs($this->admin)
             ->get(route('admin.posts.index', ['keyword' => '英語']))

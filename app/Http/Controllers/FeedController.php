@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PostType;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class FeedController extends Controller
 {
@@ -28,7 +29,9 @@ class FeedController extends Controller
             $total += $postType->modelClass()::count();
 
             $query = $postType->modelClass()::with('user')
-                ->withCount(['post_likes', 'comments']);
+                ->withCount(['post_likes', 'comments'])
+                // ログイン中のユーザーがいいね済みかどうか（$post->liked に true / false が入る）
+                ->withExists(['post_likes as liked' => fn ($q) => $q->where('user_id', Auth::id())]);
 
             if ($sort === 'latest') {
                 $query->latest()->latest('id');
