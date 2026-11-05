@@ -17,16 +17,26 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request, string $type, int $id)
     {
+        $validated = $request->validated();
         $postType = PostType::from($type);
 
         // 存在しない投稿へのコメントは 404 にする
         $post = $postType->modelClass()::findOrFail($id);
 
-        $comment = Comment::create([
-            'user_id' => Auth::id(),
-            $postType->foreignKey() => $post->id,
-            'body' => $request->validated('body'),
-        ]);
+        if ($postType === PostType::Goal) {
+            $data['goal_post_id'] = $post->id;
+        } elseif ($postType === PostType::Achievement) {
+            $data['achievement_report_id'] = $post->id;
+        } elseif ($postType === PostType::Knowledge) {
+            $data['knowledge_post_id'] = $post->id;
+        } else {
+            $data['progress_report_id'] = $post->id;
+        }
+
+        $data['user_id'] = Auth::id();
+        $data['body'] = $validated['body'];
+
+        $comment = Comment::create($data);
 
         return $this->redirectToComment($comment, 'コメントを投稿しました。');
     }
@@ -36,6 +46,8 @@ class CommentController extends Controller
      */
     public function reply(StoreCommentRequest $request, Comment $comment)
     {
+        $validated = $request->validated();
+
         $postType = $comment->postType();
 
         // 返信は親コメントと同じ投稿に紐づける
@@ -43,7 +55,7 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
             $postType->foreignKey() => $comment->{$postType->foreignKey()},
             'parent_id' => $comment->id,
-            'body' => $request->validated('body'),
+            'body' => $validated['body'],
         ]);
 
         return $this->redirectToComment($reply, '返信を投稿しました。');
@@ -55,7 +67,8 @@ class CommentController extends Controller
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
         // 本人かどうかは UpdateCommentRequest の authorize で確認済み
-        $comment->update(['body' => $request->validated('body')]);
+        $validated = $request->validated();
+        $comment->update(['body' => $validated['body']]);
 
         return $this->redirectToComment($comment, 'コメントを更新しました。');
     }
