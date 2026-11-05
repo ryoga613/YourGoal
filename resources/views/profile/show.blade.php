@@ -100,6 +100,10 @@
         @empty
             <p class="post-meta">まだ投稿はありません。</p>
         @endforelse
+        
+        @if ($posts instanceof \Illuminate\Contracts\Pagination\Paginator)
+    {{ $posts->links() }}
+@endif    
     </main>
 </div>
 @endsection
