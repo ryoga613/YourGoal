@@ -14,11 +14,11 @@ class ProfileController extends Controller
      */
     public function show(Request $request, User $user)
     {
-
         $user->loadCount('goal_posts', 'progress_reports', 'achievement_reports', 'knowledge_posts');
 
-        $goals = $user->goal_posts()->get();
-        $achievements = $user->achievement_reports()->get();
+        $goals = $user->goal_posts()->latest()->get();
+        // 達成履歴では達成した目標のタイトルを表示するので、目標も一緒に読み込む（N+1 を防ぐ）
+        $achievements = $user->achievement_reports()->with('goal_post')->latest()->get();
         $progresses = $user->progress_reports()->get();
         $knowledges = $user->knowledge_posts()->get();
 
@@ -26,11 +26,11 @@ class ProfileController extends Controller
             ->concat($achievements)
             ->concat($progresses)
             ->concat($knowledges)
-            ->sortByDesc('created_at')   // 新しい順に並べる（必要なら）
+            ->sortByDesc('created_at')   // 4種類をまとめて新しい順に並べる
             ->values();
 
         // ページネーションの設定
-        $perPage = 2;
+        $perPage = 10;
         $page = LengthAwarePaginator::resolveCurrentPage();
 
         $posts = new LengthAwarePaginator(
@@ -45,7 +45,6 @@ class ProfileController extends Controller
             'user' => $user,
             'goals' => $goals,
             'achievements' => $achievements,
-            'progresses' => $progresses,
             'posts' => $posts,
         ]);
     }
@@ -80,9 +79,6 @@ class ProfileController extends Controller
 
         $user->update($data);
 
-        // dd($validated);
-
         return redirect()->route('users.show', $user)->with('status', 'プロフィールを更新しました。');
-
     }
 }
