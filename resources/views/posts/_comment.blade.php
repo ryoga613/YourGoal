@@ -21,6 +21,18 @@
             <p style="margin:7px 0;white-space:pre-wrap;overflow-wrap:anywhere">{{ $comment->body }}</p>
 
             <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-bottom:12px">
+                {{-- いいね済みなら解除（DELETE）、まだなら登録（POST）。同じURLでメソッドだけ切り替える --}}
+                <form method="POST" action="{{ route($comment->liked ? 'comment-likes.destroy' : 'comment-likes.store', $comment) }}">
+                    @csrf
+                    @if ($comment->liked)
+                        @method('DELETE')
+                    @endif
+                    <button class="post-action post-meta" type="submit" @if ($comment->liked) style="color:#e0245e" @endif
+                            aria-pressed="{{ $comment->liked ? 'true' : 'false' }}" title="{{ $comment->liked ? 'いいねを取り消す' : 'いいねする' }}">
+                        {{ $comment->liked ? '♥' : '♡' }} {{ $comment->comment_likes_count }}
+                    </button>
+                </form>
+
                 <details @if ($isReplyTarget) open @endif>
                     <summary class="post-meta" style="cursor:pointer">返信する</summary>
                     <form method="POST" action="{{ route('comments.reply', $comment) }}" style="margin-top:8px">
