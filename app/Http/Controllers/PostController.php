@@ -31,7 +31,12 @@ class PostController extends Controller
         // コメントは返信も含めて古い順にまとめて取得し、画面側で親子に組み立てる
         $post = PostType::from($type)->modelClass()::with([
             'user',
-            'comments' => fn ($query) => $query->with('user')->oldest()->oldest('id'),
+            'comments' => fn ($query) => $query->with('user')
+                ->withCount('comment_likes')
+                // ログイン中のユーザーがそのコメントにいいね済みかどうか（$comment->liked に true / false が入る）
+                ->withExists(['comment_likes as liked' => fn ($q) => $q->where('user_id', Auth::id())])
+                ->oldest()
+                ->oldest('id'),
         ])
             ->withCount(['post_likes', 'comments'])
             // ログイン中のユーザーがいいね済みかどうか（$post->liked に true / false が入る）
