@@ -75,7 +75,12 @@
                 @endif
                 <div style="margin-top:12px"><span class="tag">{{ data_get($post, 'genre.name', data_get($post, 'genre', '学び・成長')) }}</span></div>
                 <div class="post-footer">
-                    <button class="post-action" type="button">♡ {{ data_get($post, 'post_likes_count', data_get($post, 'likes', 0)) }} いいね</button>
+                    @include('posts._like-button', [
+                        'type' => $type,
+                        'id' => $id,
+                        'liked' => (bool) data_get($post, 'liked', false),
+                        'count' => data_get($post, 'post_likes_count', data_get($post, 'likes', 0)),
+                    ])
                     <a class="post-action" href="{{ \Illuminate\Support\Facades\Route::has('posts.show') && $id ? route('posts.show', ['type'=>$type,'id'=>$id]) : '#' }}">♧ {{ data_get($post, 'comments_count') ?? data_get($post, 'comments', 0) }} コメント</a>
                     <button class="post-action" type="button">↗ シェア</button>
                 </div>

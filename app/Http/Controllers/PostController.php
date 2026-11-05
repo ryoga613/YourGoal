@@ -34,6 +34,8 @@ class PostController extends Controller
             'comments' => fn ($query) => $query->with('user')->oldest()->oldest('id'),
         ])
             ->withCount(['post_likes', 'comments'])
+            // ログイン中のユーザーがいいね済みかどうか（$post->liked に true / false が入る）
+            ->withExists(['post_likes as liked' => fn ($q) => $q->where('user_id', Auth::id())])
             ->findOrFail($id);
 
         return view('posts.show', [

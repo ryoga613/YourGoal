@@ -10,7 +10,15 @@
             <h1 class="post-title" style="font-size:24px">{{ data_get($post,'title','投稿タイトル') }}</h1>
             <p class="post-body">{{ data_get($post,'body',data_get($post,'content','')) }}</p>
             @if(data_get($post,'image_path'))<img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">@endif
-            <div class="post-footer"><button class="post-action" type="button">♡ {{  $post->post_likes_count }} いいね</button><span>♧ {{ data_get($post,'comments_count',0) }} コメント</span></div>
+            <div class="post-footer">
+                @include('posts._like-button', [
+                    'type' => request()->route('type'),
+                    'id' => $post->id,
+                    'liked' => (bool) $post->liked,
+                    'count' => $post->post_likes_count,
+                ])
+                <span>♧ {{ data_get($post,'comments_count',0) }} コメント</span>
+            </div>
         </article>
         <section class="form-card" id="comments">
             @if (session('status'))<div class="flash">{{ session('status') }}</div>@endif
