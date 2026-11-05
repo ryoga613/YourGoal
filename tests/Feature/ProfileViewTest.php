@@ -55,12 +55,13 @@ class ProfileViewTest extends TestCase
             ->assertSee(['まだ目標はありません。', 'まだ達成した目標はありません。', 'まだ投稿はありません。']);
     }
 
-    public function test_edit_form_shows_current_image_and_avatar_error(): void
+    public function test_edit_form_shows_current_image_and_image_error(): void
     {
         $user = User::factory()->create(['profile_image_path' => 'profile-images/me.png']);
 
+        // 画像の入力欄の名前は profile_image_path（UpdateProfileRequest のルールと揃えている）
         $this->actingAs($user)
-            ->withViewErrors(['avatar' => '画像ファイルを選択してください。'])
+            ->withViewErrors(['profile_image_path' => '画像ファイルを選択してください。'])
             ->view('profile.edit')
             ->assertSee(asset('storage/profile-images/me.png'), false)
             ->assertSee('画像ファイルを選択してください。');
