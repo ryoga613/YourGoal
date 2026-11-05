@@ -9,7 +9,18 @@
             @csrf @method('PATCH')
             <div class="form-group"><label for="name">表示名</label><input class="form-control" id="name" name="name" value="{{ old('name', auth()->user()->name ?? '') }}" required>@error('name')<div class="form-error">{{ $message }}</div>@enderror</div>
             <div class="form-group"><label for="bio">自己紹介</label><textarea class="form-control" id="bio" name="bio" rows="5" maxlength="500" placeholder="興味のあること、取り組んでいることなど">{{ old('bio', auth()->user()->bio ?? '') }}</textarea>@error('bio')<div class="form-error">{{ $message }}</div>@enderror</div>
-            <div class="form-group"><label for="avatar">プロフィール画像</label><input class="form-control" id="avatar" type="file" name="avatar" accept="image/*"></div>
+            <div class="form-group">
+                <label for="avatar">プロフィール画像</label>
+                {{-- 今の画像があれば表示する（新しく選ばなければそのまま残す想定） --}}
+                @if (auth()->user()->profile_image_path)
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                        <img class="avatar" src="{{ asset('storage/'.auth()->user()->profile_image_path) }}" alt="現在のプロフィール画像" style="width:56px;height:56px;object-fit:cover">
+                        <span class="post-meta">現在の画像。変更する場合だけ新しい画像を選んでください。</span>
+                    </div>
+                @endif
+                <input class="form-control" id="avatar" type="file" name="avatar" accept="image/*">
+                @error('avatar')<div class="form-error">{{ $message }}</div>@enderror
+            </div>
             <div class="form-actions"><a class="btn btn-outline" href="{{ url('/') }}">キャンセル</a><button class="btn btn-primary" type="submit">変更を保存</button></div>
         </form>
     </main>
