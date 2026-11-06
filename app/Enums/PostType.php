@@ -69,6 +69,14 @@ enum PostType: string
     }
 
     /**
+     * 投稿画像の保存先ディレクトリ（public ディスク）
+     */
+    public function imageDirectory(): string
+    {
+        return $this->value.'_images';
+    }
+
+    /**
      * 画面のタグ表示に使うCSSクラス
      */
     public function tagClass(): string

@@ -19,6 +19,17 @@
                 ])
                 <span>♧ {{ data_get($post,'comments_count',0) }} コメント</span>
             </div>
+            {{-- 自分の投稿だけ編集・削除できる --}}
+            @if(auth()->id() === $post->user_id)
+                <div class="form-actions" style="margin-top:14px">
+                    <a class="btn btn-light btn-sm" href="{{ route('posts.edit', ['type' => request()->route('type'), 'id' => $post->id]) }}">編集する</a>
+                    <form method="POST" action="{{ route('posts.destroy', ['type' => request()->route('type'), 'id' => $post->id]) }}" onsubmit="return confirm('この投稿を削除しますか？')">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger btn-sm" type="submit">削除する</button>
+                    </form>
+                </div>
+            @endif
         </article>
         <section class="form-card" id="comments">
             @if (session('status'))<div class="flash">{{ session('status') }}</div>@endif

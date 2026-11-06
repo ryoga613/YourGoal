@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Enums\GoalPostStatus;
 use App\Enums\PostType;
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -55,15 +57,40 @@ class PostController extends Controller
      */
     public function edit(string $type, int $id)
     {
-        //
+        $postType = PostType::from($type);
+        $post = $postType->modelClass()::findOrFail($id);
+
+        return view('posts.edit', [
+            'type' => $postType,
+            'post' => $post,
+        ]);
     }
 
     /**
      * 自分の投稿のタイトル・本文・画像を更新
      */
-    public function update(Request $request, string $type, int $id)
+    public function update(UpdatePostRequest $request, string $type, int $id)
     {
-        //
+        $postType = PostType::from($type);
+        $post = $postType->modelClass()::findOrFail($id);
+        $validated = $request->validated();
+
+        $data = [
+            'title' => $validated['title'] ?? null,
+            'body' => $validated['body'] ?? null,
+        ];
+
+        // 画像は新しく選んだときだけ差し替え、古い画像ファイルは消す
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store($postType->imageDirectory(), 'public');
+            $this->deleteImage($post->image_path);
+        }
+
+        $post->update($data);
+
+        return redirect()
+            ->route('posts.show', ['type' => $postType->value, 'id' => $post->id])
+            ->with('status', '投稿を更新しました。');
     }
 
     /**
@@ -71,6 +98,36 @@ class PostController extends Controller
      */
     public function destroy(string $type, int $id)
     {
-        //
+        $postType = PostType::from($type);
+        $post = $postType->modelClass()::findOrFail($id);
+
+        // コメント・いいね（目標宣言の場合は紐づく進捗報告・達成報告も）は、外部キーの cascadeOnDelete によって一緒に削除される
+        DB::transaction(function () use ($post, $postType) {
+            $post->delete();
+
+            // 達成報告を消して1件も残らなければ、達成済みだった目標を挑戦中に戻す
+            if ($postType === PostType::Achievement) {
+                $goal = $post->goal_post;
+                if ($goal->status === GoalPostStatus::Achieved && ! $goal->achievement_reports()->exists()) {
+                    $goal->update(['status' => GoalPostStatus::InProgress]);
+                }
+            }
+        });
+
+        $this->deleteImage($post->image_path);
+
+        return redirect()
+            ->route('users.show', Auth::user())
+            ->with('status', '投稿を削除しました。');
+    }
+
+    /**
+     * public ディスクに保存した投稿画像を消す
+     */
+    private function deleteImage(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }
