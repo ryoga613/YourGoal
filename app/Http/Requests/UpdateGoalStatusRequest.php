@@ -18,10 +18,9 @@ class UpdateGoalStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $goal = $this->route('goal');
+        
 
-        return $goal->user_id === $this->user()->id
-            && $goal->status !== GoalPostStatus::Achieved;
+        return true;
     }
 
     /**
