@@ -6,7 +6,17 @@
     <main>
         <a href="{{ url('/') }}" class="post-meta">← ホームに戻る</a>
         <article class="post-card" style="margin-top:15px">
-            <div class="post-head"><div class="avatar">{{ mb_substr(data_get($post,'user.name','U'),0,1) }}</div><div><div class="post-author">{{ data_get($post,'user.name','ユーザー') }}</div><div class="post-meta">{{ data_get($post,'created_at') }}</div></div></div>
+            <div class="post-head">
+                <div class="avatar">{{ mb_substr(data_get($post,'user.name','U'),0,1) }}</div>
+                <div>
+                    <div class="post-author">{{ data_get($post,'user.name','ユーザー') }}</div>
+
+                    @can('update', $post)
+                        <a href="{{ Route('posts.edit', ['type' => request()->route('type'), 'id' => $post->id]) }}">編集</a>
+                    @endcan
+                    <div class="post-meta">{{ data_get($post,'created_at') }}</div>
+                </div>
+            </div>
             <h1 class="post-title" style="font-size:24px">{{ data_get($post,'title','投稿タイトル') }}</h1>
             <p class="post-body">{{ data_get($post,'body',data_get($post,'content','')) }}</p>
             @if(data_get($post,'image_path'))<img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">@endif
