@@ -17,6 +17,8 @@
             </div>
         </div>
 
+        @if (session('status'))<div class="flash">{{ session('status') }}</div>@endif
+
         <article class="post-card">
             <div class="post-head">
                 @if($goal->user->profile_image_path)
@@ -53,6 +55,22 @@
                     <a class="btn btn-primary" href="{{ route('achievement-reports.create', $goal) }}">✓ 達成を報告</a>
                 @endif
             </div>
+
+            {{-- 達成済みは達成報告でのみ切り替わるので、達成前の目標だけステータスを変更できる --}}
+            @if($goal->status !== \App\Enums\GoalPostStatus::Achieved)
+                <form class="composer" style="flex-wrap:wrap" method="POST" action="{{ route('goals.status.update', $goal) }}">
+                    @csrf
+                    @method('PATCH')
+                    <label for="status" style="font-weight:700">ステータス</label>
+                    <select class="form-control" id="status" name="status" style="width:auto">
+                        @foreach([\App\Enums\GoalPostStatus::Considering, \App\Enums\GoalPostStatus::InProgress, \App\Enums\GoalPostStatus::Cancelled] as $status)
+                            <option value="{{ $status->value }}" @selected($goal->status === $status)>{{ $status->label() }}</option>
+                        @endforeach
+                    </select>
+                    <button class="btn btn-light" type="submit">変更する</button>
+                    @error('status')<div class="form-error" style="width:100%">{{ $message }}</div>@enderror
+                </form>
+            @endif
         @endif
 
         <h2 style="font-size:18px;margin:24px 0 14px">進捗の記録</h2>
