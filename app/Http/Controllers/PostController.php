@@ -71,7 +71,7 @@ class PostController extends Controller
 
         } elseif ($type === PostType::Achievement) {
             $post = AchievementReport::findOrFail($id);
-            
+
         } elseif ($type === PostType::Knowledge) {
             $post = KnowledgePost::findOrFail($id);
 

@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProgressReportRequest;
 use App\Models\GoalPost;
-use App\Models\ProgressReport;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProgressReportController extends Controller
@@ -39,21 +37,5 @@ class ProgressReportController extends Controller
         $goal->progress_reports()->create($data);
 
         return redirect()->route('goals.show', $goal);
-    }
-
-    /**
-     * 自分の進捗報告のタイトル・本文・画像を更新
-     */
-    public function update(Request $request, ProgressReport $progressReport)
-    {
-        //
-    }
-
-    /**
-     * 進捗報告を削除
-     */
-    public function destroy(ProgressReport $progressReport)
-    {
-        //
     }
 }

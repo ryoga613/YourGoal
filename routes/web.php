@@ -43,14 +43,10 @@ Route::middleware(['auth', 'general'])->group(function () {
     // 進捗報告
     Route::get('/goals/{goal}/progress-reports/create', [ProgressReportController::class, 'create'])->name('progress-reports.create');
     Route::post('/goals/{goal}/progress-reports', [ProgressReportController::class, 'store'])->name('progress-reports.store');
-    Route::patch('/progress-reports/{progressReport}', [ProgressReportController::class, 'update'])->name('progress-reports.update');
-    Route::delete('/progress-reports/{progressReport}', [ProgressReportController::class, 'destroy'])->name('progress-reports.destroy');
 
     // 達成報告
     Route::get('/goals/{goal}/achievement-reports/create', [AchievementReportController::class, 'create'])->name('achievement-reports.create');
     Route::post('/goals/{goal}/achievement-reports', [AchievementReportController::class, 'store'])->name('achievement-reports.store');
-    Route::patch('/achievement-reports/{achievementReport}', [AchievementReportController::class, 'update'])->name('achievement-reports.update');
-    Route::delete('/achievement-reports/{achievementReport}', [AchievementReportController::class, 'destroy'])->name('achievement-reports.destroy');
 
     // 学び・知識共有
     Route::get('/knowledge-posts/create', [KnowledgePostController::class, 'create'])->name('knowledge-posts.create');
