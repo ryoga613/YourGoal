@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\GoalPostStatus;
 use App\Http\Requests\StoreAchievementReportRequest;
-use App\Models\AchievementReport;
 use App\Models\GoalPost;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -49,21 +47,5 @@ class AchievementReportController extends Controller
         });
 
         return redirect()->route('goals.show', $goal);
-    }
-
-    /**
-     * 自分の達成報告を更新
-     */
-    public function update(Request $request, AchievementReport $achievementReport)
-    {
-        //
-    }
-
-    /**
-     * 達成報告を削除し、条件に応じ目標を挑戦中へ戻す
-     */
-    public function destroy(AchievementReport $achievementReport)
-    {
-        //
     }
 }
