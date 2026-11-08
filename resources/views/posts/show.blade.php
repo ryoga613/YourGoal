@@ -10,16 +10,34 @@
                 <div class="avatar">{{ mb_substr(data_get($post,'user.name','U'),0,1) }}</div>
                 <div>
                     <div class="post-author">{{ data_get($post,'user.name','ユーザー') }}</div>
+                    <div class="post-meta">{{ data_get($post,'created_at') }}</div>
+                </div>
+
+                {{-- 右上：投稿の種類（目標宣言はステータスも）と、本人だけの編集・削除ボタン --}}
+                <div style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px">
+                    <span class="tag {{ $post->postType()->tagClass() }}">{{ $post->postType()->label() }}</span>
+                    {{-- ステータスがあるのは目標宣言だけ --}}
+                    @if($post->postType() === \App\Enums\PostType::Goal)
+                        <span class="tag">{{ $post->status->label() }}</span>
+                    @endif
 
                     @can('update', $post)
-                        <a href="{{ Route('posts.edit', ['type' => request()->route('type'), 'id' => $post->id]) }}">編集</a>
+                        <a class="btn btn-light btn-sm" href="{{ route('posts.edit', ['type' => request()->route('type'), 'id' => $post->id]) }}">編集</a>
                     @endcan
-                    <div class="post-meta">{{ data_get($post,'created_at') }}</div>
+                    @can('delete', $post)
+                        <form action="{{ route('posts.destroy', ['type' => request()->route('type'), 'id' => $post->id]) }}" method="POST" style="margin:0" onsubmit="return confirm('この投稿を削除しますか？\nコメント・いいねも一緒に削除されます。')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">削除</button>
+                        </form>
+                    @endcan
                 </div>
             </div>
             <h1 class="post-title" style="font-size:24px">{{ data_get($post,'title','投稿タイトル') }}</h1>
             <p class="post-body">{{ data_get($post,'body',data_get($post,'content','')) }}</p>
-            @if(data_get($post,'image_path'))<img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">@endif
+            @if(data_get($post,'image_path'))
+                <img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">
+            @endif
             <div class="post-footer">
                 @include('posts._like-button', [
                     'type' => request()->route('type'),
