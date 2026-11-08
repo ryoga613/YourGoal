@@ -17,6 +17,8 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request, string $type, int $id)
     {
+        Gate::authorize('create', Comment::class);
+
         $validated = $request->validated();
         $postType = PostType::from($type);
 
@@ -46,6 +48,8 @@ class CommentController extends Controller
      */
     public function reply(StoreCommentRequest $request, Comment $comment)
     {
+        Gate::authorize('create', Comment::class);
+
         $validated = $request->validated();
 
         $postType = $comment->postType();
@@ -67,6 +71,8 @@ class CommentController extends Controller
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
         // 本人かどうかは UpdateCommentRequest の authorize で確認済み
+        Gate::authorize('update', $comment);
+
         $validated = $request->validated();
         $comment->update(['body' => $validated['body']]);
 
@@ -93,6 +99,8 @@ class CommentController extends Controller
      */
     private function redirectToComment(Comment $comment, string $message): RedirectResponse
     {
+        Gate::authorize('view', $comment);
+
         return redirect()
             ->to($this->postUrl($comment).'#comment-'.$comment->id)
             ->with('status', $message);
@@ -103,6 +111,7 @@ class CommentController extends Controller
      */
     private function postUrl(Comment $comment): string
     {
+        Gate::authorize('view', $comment);
         $postType = $comment->postType();
 
         return route('posts.show', [

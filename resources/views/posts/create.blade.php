@@ -27,7 +27,7 @@
                 <h3 class="post-title">{{ $goal->title }}</h3>
                 <div class="composer-actions">
                     <a class="btn btn-light" href="{{ route('progress-reports.create', $goal) }}">＋ 進捗を報告</a>
-                    <a class="btn btn-primary" href="{{ route('achievement-reports.create', $goal) }}">✓ 達成を報告</a>
+                        <a class="btn btn-primary" href="{{ route('achievement-reports.create', $goal) }}">✓ 達成を報告</a>
                 </div>
             </article>
         @empty

@@ -21,11 +21,16 @@ class PostController extends Controller
      */
     public function create()
     {
+
         // 進捗・達成報告は目標を選んでから書くので、まだ達成・中止していない自分の目標を渡す
         $goals = Auth::user()->goal_posts()
             ->whereIn('status', [GoalPostStatus::Considering, GoalPostStatus::InProgress])
             ->latest()
             ->get();
+
+        // 進捗・達成報告は目標ごとに確認するので、ここでは目標宣言・学び共有だけ確認する
+        Gate::authorize('create', GoalPost::class);
+        Gate::authorize('create', KnowledgePost::class);
 
         return view('posts.create', compact('goals'));
     }
@@ -49,6 +54,8 @@ class PostController extends Controller
             // ログイン中のユーザーがいいね済みかどうか（$post->liked に true / false が入る）
             ->withExists(['post_likes as liked' => fn ($q) => $q->where('user_id', Auth::id())])
             ->findOrFail($id);
+
+        Gate::authorize('view', $post);
 
         return view('posts.show', [
             'post' => $post,

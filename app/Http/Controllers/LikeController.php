@@ -7,6 +7,7 @@ use App\Models\GoalPost;
 use App\Models\KnowledgePost;
 use App\Models\PostLike;
 use App\Models\ProgressReport;
+use Illuminate\Support\Facades\Gate;
 
 class LikeController extends Controller
 {
@@ -15,6 +16,7 @@ class LikeController extends Controller
      */
     public function store(string $type, int $id)
     {
+        Gate::authorize('create', PostLike::class);
 
         if ($type === 'goal') {
             $post = GoalPost::findOrFail($id);
@@ -45,6 +47,7 @@ class LikeController extends Controller
      */
     public function destroy(string $type, int $id)
     {
+
         if ($type === 'goal') {
             $post = GoalPost::findOrFail($id);
             $foreignKey = 'goal_post_id';
@@ -61,10 +64,15 @@ class LikeController extends Controller
             return back()->with('message', '不正な投稿タイプです。');
         }
 
-        PostLike::where([
+        $postLike = PostLike::where([
             $foreignKey => $post->id,
             'user_id' => auth()->id(),
-        ])->delete();
+        ])->first();
+
+        if ($postLike) {
+            Gate::authorize('delete', $postLike);
+            $postLike->delete();
+        }
 
         return back();
     }

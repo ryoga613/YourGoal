@@ -50,10 +50,10 @@
             <div class="composer" style="flex-wrap:wrap">
                 <strong style="width:100%">次の一歩を記録しよう</strong>
                 <a class="btn btn-light" href="{{ route('progress-reports.create', $goal) }}">＋ 進捗を報告</a>
-                {{-- 達成済みの目標には、もう達成報告できないようにする --}}
-                @if($goal->status !== \App\Enums\GoalPostStatus::Achieved)
+                {{-- 達成済み・中止の目標には、達成報告できないようにする（AchievementReportPolicy@create） --}}
+                @can('create', [\App\Models\AchievementReport::class, $goal])
                     <a class="btn btn-primary" href="{{ route('achievement-reports.create', $goal) }}">✓ 達成を報告</a>
-                @endif
+                @endcan
             </div>
 
             {{-- 達成済みは達成報告でのみ切り替わるので、達成前の目標だけステータスを変更できる --}}

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\GoalPostStatus;
 use App\Http\Requests\StoreAchievementReportRequest;
+use App\Models\AchievementReport;
 use App\Models\GoalPost;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class AchievementReportController extends Controller
 {
@@ -15,10 +17,8 @@ class AchievementReportController extends Controller
      */
     public function create(GoalPost $goal)
     {
-        // 達成を報告できるのは目標を宣言した本人だけ
-        abort_if($goal->user_id !== Auth::id(), 403);
-        // 達成済みの目標には、もう達成報告できない
-        abort_if($goal->status === GoalPostStatus::Achieved, 403);
+        // 投稿の作成はログインユーザー、標宣言投稿のstatusが達成済みでない場合なら誰でも可能
+        Gate::authorize('create', [AchievementReport::class, $goal]);
 
         return view('achievement-reports.create', compact('goal'));
     }
@@ -28,9 +28,8 @@ class AchievementReportController extends Controller
      */
     public function store(StoreAchievementReportRequest $request, GoalPost $goal)
     {
-        abort_if($goal->user_id !== Auth::id(), 403);
-        abort_if($goal->status === GoalPostStatus::Achieved, 403);
-
+        // 投稿の作成はログインユーザー、標宣言投稿のstatusが達成済みでない場合なら誰でも可能
+        Gate::authorize('store', [AchievementReport::class, $goal]);
         $validated = $request->validated();
 
         $data = [
