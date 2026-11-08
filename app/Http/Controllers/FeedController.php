@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PostType;
+use App\Models\AchievementReport;
+use App\Models\GoalPost;
+use App\Models\KnowledgePost;
+use App\Models\ProgressReport;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class FeedController extends Controller
 {
@@ -14,6 +19,12 @@ class FeedController extends Controller
      */
     public function index(Request $request)
     {
+        // 投稿の閲覧権限を確認
+        Gate::authorize('view', GoalPost::class);
+        Gate::authorize('view', AchievementReport::class);
+        Gate::authorize('view', ProgressReport::class);
+        Gate::authorize('view', KnowledgePost::class);
+
         // ?sort=latest なら新着順、それ以外はおすすめ（いいねの多い順）
         $sort = $request->query('sort') === 'latest' ? 'latest' : 'popular';
         $perPage = 20;

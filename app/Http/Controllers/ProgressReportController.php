@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProgressReportRequest;
 use App\Models\GoalPost;
+use App\Models\ProgressReport;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class ProgressReportController extends Controller
 {
@@ -13,6 +15,8 @@ class ProgressReportController extends Controller
      */
     public function create(GoalPost $goal)
     {
+        Gate::authorize('create', [ProgressReport::class, $goal]);
+
         return view('progress-reports.create', compact('goal'));
     }
 

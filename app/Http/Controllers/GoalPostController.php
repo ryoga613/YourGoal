@@ -6,6 +6,7 @@ use App\Enums\GoalPostStatus;
 use App\Http\Requests\StoreUserGoalPostRequest;
 use App\Models\GoalPost;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class GoalPostController extends Controller
 {
@@ -14,6 +15,8 @@ class GoalPostController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create', GoalPost::class);
+
         return view('goals.create');
     }
 
@@ -22,6 +25,8 @@ class GoalPostController extends Controller
      */
     public function store(StoreUserGoalPostRequest $request)
     {
+        Gate::authorize('create', GoalPost::class);
+
         $validated = $request->validated();
 
         $data = [
@@ -42,6 +47,8 @@ class GoalPostController extends Controller
      */
     public function show(GoalPost $goal)
     {
+        Gate::authorize('view', $goal);
+
         $goal->loadCount(['post_likes', 'comments']);
 
         return view('goals.show', compact('goal'));

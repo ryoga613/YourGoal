@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserKnowledgePostRequest;
 use App\Models\KnowledgePost;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class KnowledgePostController extends Controller
 {
@@ -13,6 +14,8 @@ class KnowledgePostController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create', KnowledgePost::class);
+
         return view('knowledge-posts.create');
     }
 
@@ -21,6 +24,8 @@ class KnowledgePostController extends Controller
      */
     public function store(StoreUserKnowledgePostRequest $request)
     {
+        Gate::authorize('create', KnowledgePost::class);
+
         $validated = $request->validated();
 
         $data = [
@@ -40,6 +45,8 @@ class KnowledgePostController extends Controller
      */
     public function show(KnowledgePost $knowledge)
     {
+        Gate::authorize('view', KnowledgePost::class);
+
         $knowledge->load(['user', 'comments.user'])->loadCount(['post_likes', 'comments']);
 
         return view('knowledge-posts.show', compact('knowledge'));
