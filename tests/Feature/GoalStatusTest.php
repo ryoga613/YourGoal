@@ -27,6 +27,14 @@ class GoalStatusTest extends TestCase
         return GoalPost::factory()->for($owner ?? $this->user)->create(['status' => $status]);
     }
 
+    /**
+     * 目標の詳細画面（投稿詳細に統合）
+     */
+    private function showUrl(GoalPost $goal): string
+    {
+        return route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
+    }
+
     public static function changeableStatuses(): array
     {
         return [
@@ -44,8 +52,8 @@ class GoalStatusTest extends TestCase
 
         $this->actingAs($this->user)
             ->patch(route('goals.status.update', $goal), ['status' => $status->value])
-            ->assertRedirect(route('goals.show', $goal))
-            ->assertSessionHas('status', "ステータスを「{$status->label()}」に変更しました。");
+            ->assertRedirect($this->showUrl($goal).'#goal-actions')
+            ->assertSessionHas('goalStatus', "ステータスを「{$status->label()}」に変更しました。");
 
         $this->assertSame($status, $goal->fresh()->status);
     }
@@ -55,9 +63,9 @@ class GoalStatusTest extends TestCase
         $goal = $this->goal(GoalPostStatus::InProgress);
 
         $this->actingAs($this->user)
-            ->from(route('goals.show', $goal))
+            ->from($this->showUrl($goal))
             ->patch(route('goals.status.update', $goal), ['status' => GoalPostStatus::Achieved->value])
-            ->assertRedirect(route('goals.show', $goal))
+            ->assertRedirect($this->showUrl($goal))
             ->assertSessionHasErrors(['status' => '選択したステータスには変更できません。']);
 
         $this->assertSame(GoalPostStatus::InProgress, $goal->fresh()->status);
@@ -115,16 +123,16 @@ class GoalStatusTest extends TestCase
         $goal = $this->goal(GoalPostStatus::InProgress);
         $action = route('goals.status.update', $goal);
 
-        $this->actingAs($this->user)->get(route('goals.show', $goal))
+        $this->actingAs($this->user)->get($this->showUrl($goal))
             ->assertOk()
             ->assertSee($action, false);
 
-        $this->actingAs(User::factory()->create())->get(route('goals.show', $goal))
+        $this->actingAs(User::factory()->create())->get($this->showUrl($goal))
             ->assertOk()
             ->assertDontSee($action, false);
 
         $achieved = $this->goal(GoalPostStatus::Achieved);
-        $this->actingAs($this->user)->get(route('goals.show', $achieved))
+        $this->actingAs($this->user)->get($this->showUrl($achieved))
             ->assertOk()
             ->assertDontSee(route('goals.status.update', $achieved), false);
     }

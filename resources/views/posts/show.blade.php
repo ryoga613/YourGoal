@@ -48,6 +48,56 @@
                 <span>♧ {{ data_get($post,'comments_count',0) }} コメント</span>
             </div>
         </article>
+
+        {{-- 目標宣言だけ：報告ボタン・ステータス変更（本人のみ）と、進捗の記録 --}}
+        @if($post->postType() === \App\Enums\PostType::Goal)
+            <section id="goal-actions">
+                @if (session('goalStatus'))<div class="flash">{{ session('goalStatus') }}</div>@endif
+
+                {{-- 目標を宣言した本人だけが、進捗・達成を報告できる --}}
+                @can('create', [\App\Models\ProgressReport::class, $post])
+                    <div class="composer" style="flex-wrap:wrap">
+                        <strong style="width:100%">次の一歩を記録しよう</strong>
+                        <a class="btn btn-light" href="{{ route('progress-reports.create', $post) }}">＋ 進捗を報告</a>
+                        {{-- 達成済み・中止の目標には、達成報告できないようにする（AchievementReportPolicy@create） --}}
+                        @can('create', [\App\Models\AchievementReport::class, $post])
+                            <a class="btn btn-primary" href="{{ route('achievement-reports.create', $post) }}">✓ 達成を報告</a>
+                        @endcan
+                    </div>
+
+                    {{-- 達成済みは達成報告でのみ切り替わるので、達成前の目標だけステータスを変更できる --}}
+                    @if($post->status !== \App\Enums\GoalPostStatus::Achieved)
+                        <form class="composer" style="flex-wrap:wrap" method="POST" action="{{ route('goals.status.update', $post) }}">
+                            @csrf
+                            @method('PATCH')
+                            <label for="status" style="font-weight:700">ステータス</label>
+                            <select class="form-control" id="status" name="status" style="width:auto">
+                                @foreach([\App\Enums\GoalPostStatus::Considering, \App\Enums\GoalPostStatus::InProgress, \App\Enums\GoalPostStatus::Cancelled] as $status)
+                                    <option value="{{ $status->value }}" @selected($post->status === $status)>{{ $status->label() }}</option>
+                                @endforeach
+                            </select>
+                            <button class="btn btn-light" type="submit">変更する</button>
+                            @error('status')<div class="form-error" style="width:100%">{{ $message }}</div>@enderror
+                        </form>
+                    @endif
+                @endcan
+
+                <h2 style="font-size:18px;margin:24px 0 14px">進捗の記録</h2>
+                @forelse($post->progress_reports as $report)
+                    <a class="post-card" style="display:block" href="{{ route('posts.show', ['type' => 'progress', 'id' => $report->id]) }}">
+                        <div class="post-head">
+                            <span class="tag progress">進捗報告</span>
+                            <span class="post-meta">{{ $report->created_at->format('Y年n月j日') }}</span>
+                        </div>
+                        <h3 class="post-title">{{ $report->title ?? '進捗報告' }}</h3>
+                        <p class="post-body">{{ $report->body }}</p>
+                    </a>
+                @empty
+                    <div class="empty-state">まだ進捗報告はありません。最初の記録を残してみましょう。</div>
+                @endforelse
+            </section>
+        @endif
+
         <section class="form-card" id="comments">
             @if (session('status'))<div class="flash">{{ session('status') }}</div>@endif
             <h2 style="font-size:17px;margin-top:0">コメントする</h2>

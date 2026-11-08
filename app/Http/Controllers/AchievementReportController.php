@@ -45,6 +45,6 @@ class AchievementReportController extends Controller
             $goal->update(['status' => GoalPostStatus::Achieved]);
         });
 
-        return redirect()->route('goals.show', $goal);
+        return redirect()->route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
     }
 }
