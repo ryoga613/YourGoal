@@ -37,18 +37,6 @@ class KnowledgePostController extends Controller
 
         $knowledge = KnowledgePost::create($data);
 
-        return redirect()->route('knowledge-posts.show', $knowledge);
-    }
-
-    /**
-     * 学び・知識共有の詳細を表示
-     */
-    public function show(KnowledgePost $knowledge)
-    {
-        Gate::authorize('view', KnowledgePost::class);
-
-        $knowledge->load(['user', 'comments.user'])->loadCount(['post_likes', 'comments']);
-
-        return view('knowledge-posts.show', compact('knowledge'));
+        return redirect()->route('posts.show', ['type' => 'knowledge', 'id' => $knowledge->id]);
     }
 }

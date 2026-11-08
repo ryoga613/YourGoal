@@ -40,6 +40,6 @@ class ProgressReportController extends Controller
         // goal_post_id は目標のリレーション経由で自動で入る
         $goal->progress_reports()->create($data);
 
-        return redirect()->route('goals.show', $goal);
+        return redirect()->route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
     }
 }

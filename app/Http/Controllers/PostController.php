@@ -57,6 +57,11 @@ class PostController extends Controller
 
         Gate::authorize('view', $post);
 
+        // 目標宣言は、ここまでの進捗報告も古い順に表示する
+        if ($post instanceof GoalPost) {
+            $post->load(['progress_reports' => fn ($query) => $query->oldest()->oldest('id')]);
+        }
+
         return view('posts.show', [
             'post' => $post,
             // 親コメントのIDごとの返信一覧（キーが 0 のグループが投稿への直接のコメント）

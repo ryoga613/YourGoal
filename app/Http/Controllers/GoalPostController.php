@@ -39,18 +39,6 @@ class GoalPostController extends Controller
 
         $goal = GoalPost::create($data);
 
-        return redirect()->route('goals.show', $goal);
-    }
-
-    /**
-     * 目標と関連する進捗・達成報告を表示
-     */
-    public function show(GoalPost $goal)
-    {
-        Gate::authorize('view', $goal);
-
-        $goal->loadCount(['post_likes', 'comments']);
-
-        return view('goals.show', compact('goal'));
+        return redirect()->route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
     }
 }

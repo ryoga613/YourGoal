@@ -17,8 +17,9 @@ class GoalStatusController extends Controller
         $status = GoalPostStatus::from($request->validated('status'));
         $goal->update(['status' => $status]);
 
+        // コメント欄の完了メッセージ（status）と分けて、目標の操作欄に表示する
         return redirect()
-            ->route('goals.show', $goal)
-            ->with('status', "ステータスを「{$status->label()}」に変更しました。");
+            ->to(route('posts.show', ['type' => 'goal', 'id' => $goal->id]).'#goal-actions')
+            ->with('goalStatus', "ステータスを「{$status->label()}」に変更しました。");
     }
 }

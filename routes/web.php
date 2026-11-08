@@ -37,7 +37,6 @@ Route::middleware(['auth', 'general'])->group(function () {
     // 目標宣言
     Route::get('/goals/create', [GoalPostController::class, 'create'])->name('goals.create');
     Route::post('/goals', [GoalPostController::class, 'store'])->name('goals.store');
-    Route::get('/goals/{goal}', [GoalPostController::class, 'show'])->name('goals.show');
     Route::patch('/goals/{goal}/status', [GoalStatusController::class, 'update'])->name('goals.status.update');
 
     // 進捗報告
@@ -50,7 +49,6 @@ Route::middleware(['auth', 'general'])->group(function () {
 
     // 学び・知識共有
     Route::get('/knowledge-posts/create', [KnowledgePostController::class, 'create'])->name('knowledge-posts.create');
-    Route::get('/knowledge-posts/{knowledge}', [KnowledgePostController::class, 'show'])->name('knowledge-posts.show');
     Route::post('/knowledge-posts', [KnowledgePostController::class, 'store'])->name('knowledge-posts.store');
 
     // いいね
