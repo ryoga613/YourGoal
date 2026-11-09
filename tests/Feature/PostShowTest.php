@@ -177,6 +177,90 @@ class PostShowTest extends TestCase
             ->assertDontSee('進捗の記録');
     }
 
+    // ---- 報告から目標へのリンク ----
+
+    public static function reportTypes(): array
+    {
+        return [
+            '進捗報告' => [PostType::Progress],
+            '達成報告' => [PostType::Achievement],
+        ];
+    }
+
+    #[TestDox('進捗報告・達成報告の詳細に、元の目標へのリンクが出る')]
+    #[DataProvider('reportTypes')]
+    public function test_report_page_links_to_its_goal(PostType $type): void
+    {
+        $goal = GoalPost::factory()->create(['title' => '毎日30分走る']);
+        $report = $type->modelClass()::factory()->create(['goal_post_id' => $goal->id]);
+
+        $this->actingAs($this->user)
+            ->get($this->showUrl($type, $report->id))
+            ->assertOk()
+            ->assertSee('href="'.$this->showUrl(PostType::Goal, $goal->id).'"', false)
+            ->assertSee('目標「毎日30分走る」を見る');
+    }
+
+    #[TestDox('報告の詳細の目標へのリンクを押すと、元の目標の詳細が開く')]
+    #[DataProvider('reportTypes')]
+    public function test_goal_link_on_report_page_opens_the_goal(PostType $type): void
+    {
+        $goal = GoalPost::factory()->create(['title' => '毎日30分走る', 'body' => '体力をつけたい']);
+        $report = $type->modelClass()::factory()->create(['goal_post_id' => $goal->id, 'title' => '報告のタイトル']);
+
+        $html = $this->actingAs($this->user)
+            ->get($this->showUrl($type, $report->id))
+            ->assertOk()
+            ->getContent();
+
+        // 画面に出ているリンクの href をそのまま取り出して、実際に開いてみる
+        $href = $this->goalLinkHref($html);
+        $this->assertSame($this->showUrl(PostType::Goal, $goal->id), $href);
+
+        $this->actingAs($this->user)
+            ->get($href)
+            ->assertOk()
+            ->assertSee('<h1 class="post-title" style="font-size:24px">毎日30分走る</h1>', false)
+            ->assertSee('体力をつけたい')
+            ->assertSee('id="goal-actions"', false);
+    }
+
+    /**
+     * 「目標「…」を見る」ボタンの href を返す（1つだけあることも確かめる）
+     */
+    private function goalLinkHref(string $html): string
+    {
+        $dom = new \DOMDocument;
+        // HTML5 のタグで出る警告は無視する。文字化けしないように UTF-8 を指定する
+        @$dom->loadHTML('<?xml encoding="UTF-8">'.$html);
+
+        $links = [];
+        foreach ($dom->getElementsByTagName('a') as $a) {
+            if (preg_match('/^◎ 目標「.+」を見る$/u', trim($a->textContent))) {
+                $links[] = $a->getAttribute('href');
+            }
+        }
+
+        $this->assertCount(1, $links, '目標へのリンクが1つだけ表示されていること');
+
+        return $links[0];
+    }
+
+    #[TestDox('目標宣言・学び共有の詳細には、目標へのリンクが出ない')]
+    public function test_goal_and_knowledge_pages_have_no_goal_link(): void
+    {
+        $goal = GoalPost::factory()->create();
+        $knowledge = KnowledgePost::factory()->create();
+
+        $this->actingAs($this->user)->get($this->showUrl(PostType::Goal, $goal->id))
+            ->assertOk()
+            ->assertDontSee('」を見る');
+
+        $this->actingAs($this->user)->get($this->showUrl(PostType::Knowledge, $knowledge->id))
+            ->assertOk()
+            ->assertDontSee('」を見る');
+    }
+
     // ---- シェアボタン ----
 
     #[TestDox('投稿詳細のシェアボタンに URL とタイトルが入る')]

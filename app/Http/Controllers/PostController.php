@@ -62,6 +62,11 @@ class PostController extends Controller
             $post->load(['progress_reports' => fn ($query) => $query->oldest()->oldest('id')]);
         }
 
+        // 進捗報告・達成報告は、元の目標宣言へのリンクを出すので目標も読み込む
+        if ($post instanceof ProgressReport || $post instanceof AchievementReport) {
+            $post->load('goal_post');
+        }
+
         return view('posts.show', [
             'post' => $post,
             // 親コメントのIDごとの返信一覧（キーが 0 のグループが投稿への直接のコメント）
