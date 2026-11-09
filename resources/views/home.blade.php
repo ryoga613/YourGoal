@@ -74,14 +74,14 @@
                     <div class="post-image">投稿に関連するイメージ</div>
                 @endif
                 <div class="post-footer">
-                    @include('posts._like-button', [ 
+                    @include('posts._like-button', [
                         'type' => $type,
                         'id' => $id,
                         'liked' => (bool) data_get($post, 'liked', false),
                         'count' => data_get($post, 'post_likes_count', data_get($post, 'likes', 0)),
                     ])
                     <a class="post-action" href="{{ \Illuminate\Support\Facades\Route::has('posts.show') && $id ? route('posts.show', ['type'=>$type,'id'=>$id]) : '#' }}">♧ {{ data_get($post, 'comments_count') ?? data_get($post, 'comments', 0) }} コメント</a>
-                    <button class="post-action" type="button">↗ シェア</button>
+                    @include('posts._share-button', ['type' => $type, 'id' => $id, 'title' => $title])
                 </div>
             </article>
         @empty
@@ -106,3 +106,4 @@
     </aside>
 </div>
 @endsection
+

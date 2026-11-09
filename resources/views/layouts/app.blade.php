@@ -87,6 +87,34 @@
             event.target.setCustomValidity('');
         }
     });
+
+    // シェアボタン（posts/_share-button）：端末の共有メニューを開く（使えないブラウザでは URL をコピーする）
+    document.addEventListener('click', async (event) => {
+        // 押された場所から、いちばん近いシェアボタンを探す（ボタンの中の文字を押しても拾えるように）
+        const button = event.target.closest('.share-btn');
+        if (!button) return; // シェアボタン以外のクリックは何もしない
+
+        const url = button.dataset.shareUrl;     // data-share-url の値
+        const title = button.dataset.shareTitle; // data-share-title の値
+
+        // 1) スマホなど、共有メニューが使える端末
+        if (navigator.share) {
+            try {
+                await navigator.share({ title, url });
+            } catch (error) {
+                // 共有メニューを閉じただけのとき（AbortError）は何もしない
+            }
+            return;
+        }
+
+        // 2) 使えないブラウザ：URL をクリップボードにコピーする
+        try {
+            await navigator.clipboard.writeText(url);
+            alert('リンクをコピーしました');
+        } catch (error) {
+            alert('リンクをコピーできませんでした');
+        }
+    });
 </script>
 </body>
 </html>
