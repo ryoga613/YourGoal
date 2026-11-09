@@ -7,6 +7,7 @@ use App\Models\GoalPost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class GoalStatusTest extends TestCase
@@ -44,6 +45,7 @@ class GoalStatusTest extends TestCase
         ];
     }
 
+    #[TestDox('本人は目標のステータスを変えられる')]
     #[DataProvider('changeableStatuses')]
     public function test_owner_can_change_status(GoalPostStatus $status): void
     {
@@ -58,6 +60,7 @@ class GoalStatusTest extends TestCase
         $this->assertSame($status, $goal->fresh()->status);
     }
 
+    #[TestDox('ステータスを直接「達成済み」にはできない')]
     public function test_cannot_change_to_achieved_directly(): void
     {
         $goal = $this->goal(GoalPostStatus::InProgress);
@@ -71,6 +74,7 @@ class GoalStatusTest extends TestCase
         $this->assertSame(GoalPostStatus::InProgress, $goal->fresh()->status);
     }
 
+    #[TestDox('ステータスは必須で、決められた値だけ')]
     public function test_status_is_required_and_must_be_valid(): void
     {
         $goal = $this->goal(GoalPostStatus::InProgress);
@@ -86,6 +90,7 @@ class GoalStatusTest extends TestCase
         $this->assertSame(GoalPostStatus::InProgress, $goal->fresh()->status);
     }
 
+    #[TestDox('達成済みの目標はステータスを変えられない')]
     public function test_achieved_goal_status_cannot_be_changed(): void
     {
         $goal = $this->goal(GoalPostStatus::Achieved);
@@ -97,6 +102,7 @@ class GoalStatusTest extends TestCase
         $this->assertSame(GoalPostStatus::Achieved, $goal->fresh()->status);
     }
 
+    #[TestDox('他人は目標のステータスを変えられない')]
     public function test_other_user_cannot_change_status(): void
     {
         $goal = $this->goal(GoalPostStatus::InProgress, User::factory()->create());
@@ -108,6 +114,7 @@ class GoalStatusTest extends TestCase
         $this->assertSame(GoalPostStatus::InProgress, $goal->fresh()->status);
     }
 
+    #[TestDox('ゲストは目標のステータスを変えられない')]
     public function test_guest_cannot_change_status(): void
     {
         $goal = $this->goal(GoalPostStatus::InProgress);
@@ -118,6 +125,7 @@ class GoalStatusTest extends TestCase
         $this->assertSame(GoalPostStatus::InProgress, $goal->fresh()->status);
     }
 
+    #[TestDox('ステータス変更フォームは未達成の目標の本人にだけ出る')]
     public function test_status_form_is_shown_only_to_owner_of_unachieved_goal(): void
     {
         $goal = $this->goal(GoalPostStatus::InProgress);

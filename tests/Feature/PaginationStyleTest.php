@@ -6,6 +6,7 @@ use App\Models\KnowledgePost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 /**
@@ -23,6 +24,7 @@ class PaginationStyleTest extends TestCase
         ];
     }
 
+    #[TestDox('ページ送りはこのアプリの CSS が当たる HTML で表示される')]
     #[DataProvider('pages')]
     public function test_pagination_uses_styled_markup(string $routeName): void
     {

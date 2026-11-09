@@ -12,6 +12,7 @@ use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -27,6 +28,7 @@ class UserTest extends TestCase
         $this->admin = User::factory()->admin()->create(['name' => '管理者アカウント']);
     }
 
+    #[TestDox('管理者はユーザー一覧を見られる')]
     public function test_admin_can_see_user_list(): void
     {
         $user = User::factory()->create(['name' => '一覧に出るユーザー']);
@@ -39,6 +41,7 @@ class UserTest extends TestCase
             ->assertSee('1件');
     }
 
+    #[TestDox('ユーザー一覧に管理者は出ない')]
     public function test_admin_is_not_shown_in_list(): void
     {
         $this->actingAs($this->admin)
@@ -51,6 +54,7 @@ class UserTest extends TestCase
             ->assertDontSee('管理者アカウント');
     }
 
+    #[TestDox('ユーザー一覧は新しい順に並ぶ')]
     public function test_list_is_ordered_by_newest(): void
     {
         User::factory()->create(['name' => '古いユーザー', 'created_at' => now()->subDays(2)]);
@@ -62,6 +66,7 @@ class UserTest extends TestCase
             ->assertSeeInOrder(['新しいユーザー', '真ん中のユーザー', '古いユーザー']);
     }
 
+    #[TestDox('名前かメールアドレスでユーザーを検索できる')]
     public function test_admin_can_search_users_by_name_or_email(): void
     {
         User::factory()->create(['name' => '山田太郎', 'email' => 'taro@example.com']);
@@ -81,6 +86,7 @@ class UserTest extends TestCase
             ->assertDontSee('関係ないユーザー');
     }
 
+    #[TestDox('256文字以上のキーワードは入力エラーになる')]
     public function test_keyword_longer_than_255_characters_is_rejected(): void
     {
         $this->actingAs($this->admin)
@@ -88,6 +94,7 @@ class UserTest extends TestCase
             ->assertSessionHasErrors('keyword');
     }
 
+    #[TestDox('キーワードの % や _ は普通の文字として検索される')]
     public function test_like_wildcards_in_keyword_are_treated_as_characters(): void
     {
         User::factory()->create(['name' => '100%ユーザー']);
@@ -106,6 +113,7 @@ class UserTest extends TestCase
             ->assertDontSee('snakeXuser');
     }
 
+    #[TestDox('ユーザー一覧に投稿数とコメント数が出る')]
     public function test_list_shows_post_and_comment_counts(): void
     {
         $user = User::factory()->create();
@@ -121,6 +129,7 @@ class UserTest extends TestCase
             ->assertSee('<td class="nowrap">4 / 2</td>', false);
     }
 
+    #[TestDox('ページ送りのリンクにキーワードが引き継がれる')]
     public function test_keyword_is_kept_in_pagination_links(): void
     {
         User::factory(21)->sequence(fn ($sequence) => ['name' => '検索ユーザー'.$sequence->index])->create();
@@ -130,6 +139,7 @@ class UserTest extends TestCase
             ->assertSee('keyword='.urlencode('検索'), false);
     }
 
+    #[TestDox('ユーザー一覧で N+1 問題が起きない')]
     public function test_list_does_not_cause_n_plus_one_queries(): void
     {
         $countQueries = function (): int {
@@ -154,6 +164,7 @@ class UserTest extends TestCase
         $this->assertSame($before, $countQueries());
     }
 
+    #[TestDox('管理者はユーザー詳細と投稿を見られる')]
     public function test_admin_can_see_user_detail_with_posts(): void
     {
         $user = User::factory()->create(['name' => '詳細のユーザー', 'bio' => '自己紹介文です']);
@@ -170,6 +181,7 @@ class UserTest extends TestCase
             ->assertSee(route('admin.posts.show', ['type' => 'knowledge', 'id' => $knowledge->id]));
     }
 
+    #[TestDox('削除の確認に、一緒に消える投稿数とコメント数が出る')]
     public function test_delete_confirmation_shows_post_and_comment_counts(): void
     {
         $user = User::factory()->create();
@@ -181,6 +193,7 @@ class UserTest extends TestCase
             ->assertSee('投稿2件・コメント3件');
     }
 
+    #[TestDox('ユーザーを削除すると投稿・コメント・いいねも消える')]
     public function test_deleting_user_also_deletes_posts_comments_and_likes(): void
     {
         $user = User::factory()->create();
@@ -203,6 +216,7 @@ class UserTest extends TestCase
         $this->assertModelExists($other);
     }
 
+    #[TestDox('管理者ユーザーは削除できない')]
     public function test_admin_user_can_not_be_deleted(): void
     {
         $otherAdmin = User::factory()->admin()->create();
@@ -219,6 +233,7 @@ class UserTest extends TestCase
         $this->assertModelExists($otherAdmin);
     }
 
+    #[TestDox('一般ユーザーはユーザー管理を使えない')]
     public function test_general_user_can_not_manage_users(): void
     {
         $user = User::factory()->create();

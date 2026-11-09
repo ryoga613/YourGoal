@@ -9,12 +9,14 @@ use App\Models\KnowledgePost;
 use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[TestDox('管理者はダッシュボードでユーザー数・投稿数・今日のコメント数を見られる')]
     public function test_admin_can_see_counts(): void
     {
         $admin = User::factory()->admin()->create();

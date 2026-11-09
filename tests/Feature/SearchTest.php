@@ -8,6 +8,7 @@ use App\Models\KnowledgePost;
 use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class SearchTest extends TestCase
@@ -23,11 +24,13 @@ class SearchTest extends TestCase
         $this->user = User::factory()->create();
     }
 
+    #[TestDox('ゲストはログイン画面に送られる')]
     public function test_guest_is_redirected_to_login(): void
     {
         $this->get(route('posts.search'))->assertRedirect(route('login'));
     }
 
+    #[TestDox('条件なしで検索すると4種類すべての投稿が出る')]
     public function test_without_conditions_all_types_are_listed(): void
     {
         $goal = GoalPost::factory()->create(['title' => '目標のタイトル']);
@@ -42,6 +45,7 @@ class SearchTest extends TestCase
             ->assertSee('4件');
     }
 
+    #[TestDox('キーワードはタイトルにヒットする')]
     public function test_keyword_matches_title(): void
     {
         KnowledgePost::factory()->create(['title' => 'Laravelの勉強法', 'body' => '本文']);
@@ -55,6 +59,7 @@ class SearchTest extends TestCase
             ->assertSee('1件');
     }
 
+    #[TestDox('キーワードは本文にヒットする')]
     public function test_keyword_matches_body(): void
     {
         GoalPost::factory()->create(['title' => '本文でヒットする投稿', 'body' => '毎朝ランニングする']);
@@ -66,6 +71,7 @@ class SearchTest extends TestCase
             ->assertDontSee('関係ない投稿');
     }
 
+    #[TestDox('キーワードは投稿者名にヒットする')]
     public function test_keyword_matches_user_name(): void
     {
         $author = User::factory()->create(['name' => 'やまだたろう']);
@@ -78,6 +84,7 @@ class SearchTest extends TestCase
             ->assertDontSee('他の人の投稿');
     }
 
+    #[TestDox('キーワードの % や _ は普通の文字として検索される')]
     public function test_like_wildcards_in_keyword_are_searched_as_plain_text(): void
     {
         KnowledgePost::factory()->create(['title' => '達成率100%を目指す']);
@@ -90,6 +97,7 @@ class SearchTest extends TestCase
             ->assertDontSee('普通の投稿');
     }
 
+    #[TestDox('投稿の種類で絞り込める')]
     public function test_type_filters_post_type(): void
     {
         GoalPost::factory()->create(['title' => '目標のタイトル']);
@@ -102,6 +110,7 @@ class SearchTest extends TestCase
             ->assertSee('1件');
     }
 
+    #[TestDox('キーワードと種類は両方を満たすもので絞り込まれる')]
     public function test_keyword_and_type_are_combined_with_and(): void
     {
         GoalPost::factory()->create(['title' => '英語の目標']);
@@ -115,6 +124,7 @@ class SearchTest extends TestCase
             ->assertDontSee('数学の学び');
     }
 
+    #[TestDox('存在しない種類を指定すると入力エラーになる')]
     public function test_invalid_type_is_rejected(): void
     {
         $this->actingAs($this->user)
@@ -122,6 +132,7 @@ class SearchTest extends TestCase
             ->assertSessionHasErrors('type');
     }
 
+    #[TestDox('検索結果から投稿詳細に移れる')]
     public function test_results_link_to_post_detail(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -131,6 +142,7 @@ class SearchTest extends TestCase
             ->assertSee(route('posts.show', ['type' => 'knowledge', 'id' => $post->id]), false);
     }
 
+    #[TestDox('検索結果は種類をまたいで新しい順に、ページ分けして並ぶ')]
     public function test_results_are_paginated_newest_first_across_types(): void
     {
         // 25件のうち、一番新しいのは学び共有、一番古いのは目標宣言

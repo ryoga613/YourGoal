@@ -8,6 +8,7 @@ use App\Models\KnowledgePost;
 use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 /**
@@ -17,6 +18,7 @@ class ProfileViewTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[TestDox('プロフィールにユーザー情報・目標・達成・投稿が表示される')]
     public function test_profile_shows_user_info_goals_achievements_and_posts(): void
     {
         $user = User::factory()->create(['name' => '田中一郎', 'bio' => '毎日コツコツ']);
@@ -43,6 +45,7 @@ class ProfileViewTest extends TestCase
             ->assertDontSee('プロフィールを編集');
     }
 
+    #[TestDox('自分のプロフィールには編集ボタンと、空のときの案内が出る')]
     public function test_own_profile_shows_edit_button_and_empty_states(): void
     {
         $user = User::factory()->create(['bio' => null]);
@@ -55,6 +58,7 @@ class ProfileViewTest extends TestCase
             ->assertSee(['まだ目標はありません。', 'まだ達成した目標はありません。', 'まだ投稿はありません。']);
     }
 
+    #[TestDox('プロフィール編集画面に今の画像と、画像の入力エラーが出る')]
     public function test_edit_form_shows_current_image_and_image_error(): void
     {
         $user = User::factory()->create(['profile_image_path' => 'profile-images/me.png']);
@@ -67,6 +71,7 @@ class ProfileViewTest extends TestCase
             ->assertSee('画像ファイルを選択してください。');
     }
 
+    #[TestDox('タイトルのない進捗報告もプロフィールに一覧表示される')]
     public function test_progress_report_without_title_is_listed(): void
     {
         $user = User::factory()->create();

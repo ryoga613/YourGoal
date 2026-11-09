@@ -10,6 +10,7 @@ use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class CommentTest extends TestCase
@@ -25,6 +26,7 @@ class CommentTest extends TestCase
         $this->admin = User::factory()->admin()->create();
     }
 
+    #[TestDox('管理者はコメント一覧を見られる')]
     public function test_admin_can_see_comment_list(): void
     {
         $comment = Comment::factory()->forPost(GoalPost::factory()->create())->create(['body' => '一覧に表示されるコメント']);
@@ -36,6 +38,7 @@ class CommentTest extends TestCase
             ->assertSee($comment->user->name);
     }
 
+    #[TestDox('本文か投稿者名でコメントを検索できる')]
     public function test_admin_can_search_comments_by_body_or_user_name(): void
     {
         $taro = User::factory()->create(['name' => '山田太郎']);
@@ -56,6 +59,7 @@ class CommentTest extends TestCase
             ->assertDontSee('関係ないコメント');
     }
 
+    #[TestDox('投稿の種類でコメントを絞り込める')]
     public function test_admin_can_filter_comments_by_post_type(): void
     {
         Comment::factory()->forPost(GoalPost::factory()->create())->create(['body' => '目標へのコメント']);
@@ -67,6 +71,7 @@ class CommentTest extends TestCase
             ->assertDontSee('学びへのコメント');
     }
 
+    #[TestDox('存在しない投稿の種類を指定すると入力エラーになる')]
     public function test_invalid_post_type_is_rejected(): void
     {
         $this->actingAs($this->admin)
@@ -74,6 +79,7 @@ class CommentTest extends TestCase
             ->assertSessionHasErrors('type');
     }
 
+    #[TestDox('管理者はコメント詳細と返信を見られる')]
     public function test_admin_can_see_comment_detail_with_replies(): void
     {
         $post = GoalPost::factory()->create(['title' => 'コメント先の目標']);
@@ -89,6 +95,7 @@ class CommentTest extends TestCase
             ->assertSee(route('admin.posts.show', ['type' => 'goal', 'id' => $post->id]));
     }
 
+    #[TestDox('コメントを削除すると返信といいねも消える')]
     public function test_deleting_comment_also_deletes_replies_and_likes(): void
     {
         $comment = Comment::factory()->create();
@@ -108,6 +115,7 @@ class CommentTest extends TestCase
         $this->assertModelExists($other);
     }
 
+    #[TestDox('コメント一覧に返信数といいね数が出る')]
     public function test_list_shows_reply_and_like_counts(): void
     {
         $comment = Comment::factory()->create(['created_at' => now()->subDay()]);
@@ -119,6 +127,7 @@ class CommentTest extends TestCase
             ->assertSee('<td class="nowrap">1 / 2</td>', false);
     }
 
+    #[TestDox('コメント一覧で N+1 問題が起きない')]
     public function test_list_does_not_cause_n_plus_one_queries(): void
     {
         $countQueries = function (): int {
@@ -143,6 +152,7 @@ class CommentTest extends TestCase
         $this->assertSame($before, $countQueries());
     }
 
+    #[TestDox('検索したあとも、選んだ投稿の種類が選ばれたままになる')]
     public function test_selected_post_type_is_kept_after_search(): void
     {
         $this->actingAs($this->admin)
@@ -150,6 +160,7 @@ class CommentTest extends TestCase
             ->assertSee('<option value="goal" selected>', false);
     }
 
+    #[TestDox('投稿日時が同じでも、ページ送りで抜けや重複が出ない')]
     public function test_pagination_is_stable_when_created_at_is_the_same(): void
     {
         $comments = Comment::factory(25)->create(['created_at' => now()]);
@@ -161,6 +172,7 @@ class CommentTest extends TestCase
         $this->assertSame($comments->pluck('id')->sortDesc()->values()->all(), $ids->all());
     }
 
+    #[TestDox('キーワードの % や _ は普通の文字として検索される')]
     public function test_like_wildcards_in_keyword_are_treated_as_characters(): void
     {
         Comment::factory()->create(['body' => '目標を100%達成']);
@@ -179,6 +191,7 @@ class CommentTest extends TestCase
             ->assertDontSee('snakeXcase');
     }
 
+    #[TestDox('削除の確認に、返信への返信も含めた件数が出る')]
     public function test_delete_confirmation_counts_nested_replies(): void
     {
         $comment = Comment::factory()->create();
@@ -196,6 +209,7 @@ class CommentTest extends TestCase
         $this->assertDatabaseCount('comments', 0);
     }
 
+    #[TestDox('一般ユーザーはコメント管理を使えない')]
     public function test_general_user_can_not_manage_comments(): void
     {
         $user = User::factory()->create();
