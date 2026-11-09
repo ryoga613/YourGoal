@@ -44,7 +44,6 @@
     </form>
     @endunless
     <div class="top-actions">
-        <a class="icon-link" href="#" aria-label="通知">♧</a>
         @auth
             @if(auth()->user()->isAdmin())
                 <a class="btn btn-light" href="{{ route('admin.dashboard') }}">管理画面</a>

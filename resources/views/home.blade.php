@@ -62,7 +62,6 @@
                     <div class="avatar">{{ $initial }}</div>
                     <div><div class="post-author">{{ $author }}</div><div class="post-meta">{{ data_get($post, 'created_at') ? \Illuminate\Support\Carbon::parse(data_get($post, 'created_at'))->diffForHumans() : data_get($post, 'time', '最近') }}</div></div>
                     <span class="tag {{ $tagClass }}" style="margin-left:8px">{{ $label }}</span>
-                    <span class="post-menu">•••</span>
                 </div>
                 <a href="{{ \Illuminate\Support\Facades\Route::has('posts.show') && $id ? route('posts.show', ['type'=>$type,'id'=>$id]) : '#' }}">
                     <h2 class="post-title">{{ $title }}</h2>
