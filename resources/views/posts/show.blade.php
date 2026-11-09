@@ -46,6 +46,11 @@
                     'count' => $post->post_likes_count,
                 ])
                 <span>♧ {{ data_get($post,'comments_count',0) }} コメント</span>
+                @include('posts._share-button', [
+                    'type' => request()->route('type'),
+                    'id' => $post->id,
+                    'title' => data_get($post, 'title') ?? $post->postType()->label(),
+                ])
             </div>
         </article>
 

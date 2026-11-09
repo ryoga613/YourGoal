@@ -23,7 +23,7 @@ class FeedTest extends TestCase
             ->assertSee(route('posts.show', ['type' => 'goal', 'id' => $goal->id]), false)
             ->assertSee(route('posts.show', ['type' => 'knowledge', 'id' => $knowledge->id]), false);
 
-        // 同じ投稿が2回表示されていないこと
-        $this->assertSame(1, substr_count($response->getContent(), 'ホームの目標'));
+        // 同じ投稿が2回表示されていないこと（タイトルはシェアボタンの data-share-title にも入るので、カードの見出しで数える）
+        $this->assertSame(1, substr_count($response->getContent(), '<h2 class="post-title">ホームの目標</h2>'));
     }
 }
