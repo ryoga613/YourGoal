@@ -33,6 +33,7 @@ class AchievementReportController extends Controller
         $validated = $request->validated();
 
         $data = [
+            'goal_post_id' => $goal->id,
             'title' => $validated['title'],
             'body' => $validated['body'] ?? null,
             'image_path' => $request->file('image')?->store('achievement_images', 'public'),
@@ -40,11 +41,14 @@ class AchievementReportController extends Controller
         ];
 
         // 報告の保存とステータス変更は、どちらかだけ成功しないようにまとめて行う
-        DB::transaction(function () use ($goal, $data) {
-            $goal->achievement_reports()->create($data);
+        $achievement = DB::transaction(function () use ($goal, $data) {
+            $achievement = AchievementReport::create($data);
             $goal->update(['status' => GoalPostStatus::Achieved]);
+
+            return $achievement;
         });
 
-        return redirect()->route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
+        return redirect()->route('posts.show', ['type' => 'achievement', 'id' => $achievement->id]);
+
     }
 }
