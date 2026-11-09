@@ -7,6 +7,7 @@ use App\Models\KnowledgePost;
 use App\Models\PostLike;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 /**
@@ -25,6 +26,7 @@ class LikeButtonTest extends TestCase
         $this->user = User::factory()->create();
     }
 
+    #[TestDox('投稿詳細：いいね前は「いいねする」フォームが出る')]
     public function test_post_page_shows_like_form_when_not_liked(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -38,6 +40,7 @@ class LikeButtonTest extends TestCase
             ->assertDontSee('name="_method" value="DELETE"', false);
     }
 
+    #[TestDox('投稿詳細：いいね済みなら「いいねを外す」フォームが出る')]
     public function test_post_page_shows_unlike_form_when_liked(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -50,6 +53,7 @@ class LikeButtonTest extends TestCase
             ->assertSee('♥ 1 いいね');
     }
 
+    #[TestDox('ホームでは投稿ごとに、いいね済みかどうかが表示される')]
     public function test_home_shows_liked_state_per_post(): void
     {
         $liked = GoalPost::factory()->create();

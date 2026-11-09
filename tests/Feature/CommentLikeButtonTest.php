@@ -7,6 +7,7 @@ use App\Models\CommentLike;
 use App\Models\KnowledgePost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 /**
@@ -35,6 +36,7 @@ class CommentLikeButtonTest extends TestCase
             ->assertOk();
     }
 
+    #[TestDox('コメント：いいね前は「いいねする」フォームといいね数が出る')]
     public function test_comment_shows_like_form_and_count_when_not_liked(): void
     {
         $comment = Comment::factory()->forPost($this->post)->create();
@@ -46,6 +48,7 @@ class CommentLikeButtonTest extends TestCase
             ->assertDontSee('♥ 1');
     }
 
+    #[TestDox('コメント：いいね済みなら「いいねを外す」フォームが出る')]
     public function test_comment_shows_unlike_form_when_liked(): void
     {
         $comment = Comment::factory()->forPost($this->post)->create();
@@ -60,6 +63,7 @@ class CommentLikeButtonTest extends TestCase
         );
     }
 
+    #[TestDox('返信にもいいねボタンがある')]
     public function test_replies_also_have_like_button(): void
     {
         $comment = Comment::factory()->forPost($this->post)->create();
@@ -70,6 +74,7 @@ class CommentLikeButtonTest extends TestCase
             ->assertSee('action="'.route('comment-likes.store', $reply).'"', false);
     }
 
+    #[TestDox('コメントにいいねすると投稿詳細に戻り、いいね済みになる')]
     public function test_liking_a_comment_returns_to_post_page_and_shows_liked(): void
     {
         $comment = Comment::factory()->forPost($this->post)->create();

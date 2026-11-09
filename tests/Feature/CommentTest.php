@@ -8,6 +8,7 @@ use App\Models\KnowledgePost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class CommentTest extends TestCase
@@ -33,6 +34,7 @@ class CommentTest extends TestCase
 
     // ---- 投稿へのコメント ----
 
+    #[TestDox('4種類どの投稿にもコメントできる')]
     #[DataProvider('postTypes')]
     public function test_user_can_comment_on_each_post_type(PostType $type): void
     {
@@ -51,6 +53,7 @@ class CommentTest extends TestCase
             ->assertSessionHas('status', 'コメントを投稿しました。');
     }
 
+    #[TestDox('ゲストはコメントできない')]
     public function test_guest_cannot_comment(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -61,6 +64,7 @@ class CommentTest extends TestCase
         $this->assertDatabaseCount('comments', 0);
     }
 
+    #[TestDox('管理者はコメントできない')]
     public function test_admin_cannot_comment(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -71,6 +75,7 @@ class CommentTest extends TestCase
         $this->assertDatabaseCount('comments', 0);
     }
 
+    #[TestDox('存在しない投稿へのコメントは404になる')]
     public function test_commenting_on_missing_post_returns_404(): void
     {
         $this->actingAs($this->user)
@@ -78,6 +83,7 @@ class CommentTest extends TestCase
             ->assertNotFound();
     }
 
+    #[TestDox('コメントは必須で、1000文字まで')]
     public function test_comment_body_is_required_and_limited_to_1000_characters(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -97,6 +103,7 @@ class CommentTest extends TestCase
 
     // ---- 返信 ----
 
+    #[TestDox('返信は親コメントと同じ投稿に紐づく')]
     public function test_reply_is_attached_to_parent_and_same_post(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -112,6 +119,7 @@ class CommentTest extends TestCase
         $this->assertSame(PostType::Knowledge, $reply->postType());
     }
 
+    #[TestDox('返信の入力エラーは返信フォームの下に出る')]
     public function test_reply_validation_error_goes_to_reply_error_bag(): void
     {
         $parent = Comment::factory()->forPost(KnowledgePost::factory()->create())->create();
@@ -125,6 +133,7 @@ class CommentTest extends TestCase
 
     // ---- 編集 ----
 
+    #[TestDox('自分のコメントを編集できる')]
     public function test_user_can_update_own_comment(): void
     {
         $comment = Comment::factory()->for($this->user)->create(['body' => '編集前']);
@@ -136,6 +145,7 @@ class CommentTest extends TestCase
         $this->assertSame('編集後', $comment->fresh()->body);
     }
 
+    #[TestDox('他人のコメントは編集できない')]
     public function test_user_cannot_update_others_comment(): void
     {
         $comment = Comment::factory()->create(['body' => '他人のコメント']);
@@ -147,6 +157,7 @@ class CommentTest extends TestCase
         $this->assertSame('他人のコメント', $comment->fresh()->body);
     }
 
+    #[TestDox('編集の入力エラーは編集フォームの下に出る')]
     public function test_update_validation_error_goes_to_update_error_bag(): void
     {
         $comment = Comment::factory()->for($this->user)->create(['body' => '編集前']);
@@ -160,6 +171,7 @@ class CommentTest extends TestCase
 
     // ---- 削除 ----
 
+    #[TestDox('自分のコメントを削除すると返信も一緒に消える')]
     public function test_user_can_delete_own_comment_with_its_replies(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -177,6 +189,7 @@ class CommentTest extends TestCase
         $this->assertSame([$other->id], Comment::pluck('id')->all());
     }
 
+    #[TestDox('他人のコメントは削除できない')]
     public function test_user_cannot_delete_others_comment(): void
     {
         $comment = Comment::factory()->create();
@@ -190,6 +203,7 @@ class CommentTest extends TestCase
 
     // ---- 詳細画面の表示 ----
 
+    #[TestDox('投稿詳細にコメントと返信が親子の順に並ぶ')]
     public function test_post_page_shows_comments_and_nested_replies_in_order(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -205,6 +219,7 @@ class CommentTest extends TestCase
             ->assertSee('3 コメント');
     }
 
+    #[TestDox('コメントの編集・削除ボタンは自分のコメントにだけ出る')]
     public function test_edit_and_delete_buttons_are_shown_only_on_own_comments(): void
     {
         $post = KnowledgePost::factory()->create();

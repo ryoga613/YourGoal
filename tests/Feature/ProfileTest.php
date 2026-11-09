@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -25,11 +26,13 @@ class ProfileTest extends TestCase
 
     // ---- 表示 ----
 
+    #[TestDox('ゲストはログイン画面に送られる')]
     public function test_guest_is_redirected_to_login(): void
     {
         $this->get(route('users.show', $this->user))->assertRedirect(route('login'));
     }
 
+    #[TestDox('プロフィールに投稿数が出て、投稿は1ページ10件ずつ並ぶ')]
     public function test_profile_shows_post_count_and_10_posts_per_page(): void
     {
         KnowledgePost::factory()->for($this->user)->count(11)->create();
@@ -47,6 +50,7 @@ class ProfileTest extends TestCase
 
     // ---- 編集 ----
 
+    #[TestDox('プロフィール編集画面に今の値が入っている')]
     public function test_edit_form_shows_current_values(): void
     {
         $this->actingAs($this->user)
@@ -56,6 +60,7 @@ class ProfileTest extends TestCase
             ->assertSee('元の自己紹介');
     }
 
+    #[TestDox('表示名と自己紹介を更新できる')]
     public function test_user_can_update_name_and_bio(): void
     {
         $this->actingAs($this->user)
@@ -68,6 +73,7 @@ class ProfileTest extends TestCase
         $this->assertSame('新しい自己紹介', $this->user->bio);
     }
 
+    #[TestDox('アップロードした画像が保存され、パスが記録される')]
     public function test_uploaded_image_is_stored_and_path_saved(): void
     {
         Storage::fake('public');
@@ -84,6 +90,7 @@ class ProfileTest extends TestCase
         Storage::disk('public')->assertExists($path);
     }
 
+    #[TestDox('画像を選ばずに更新すると今の画像が残る')]
     public function test_updating_without_image_keeps_current_image(): void
     {
         $this->user->update(['profile_image_path' => 'profile-images/current.png']);
@@ -94,6 +101,7 @@ class ProfileTest extends TestCase
         $this->assertSame('profile-images/current.png', $this->user->fresh()->profile_image_path);
     }
 
+    #[TestDox('SVG 画像はアップロードできない')]
     public function test_svg_is_rejected(): void
     {
         Storage::fake('public');
@@ -108,6 +116,7 @@ class ProfileTest extends TestCase
         $this->assertNull($this->user->fresh()->profile_image_path);
     }
 
+    #[TestDox('表示名は必須')]
     public function test_name_is_required(): void
     {
         $this->actingAs($this->user)

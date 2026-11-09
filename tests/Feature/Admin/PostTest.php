@@ -11,6 +11,7 @@ use App\Models\ProgressReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 class PostTest extends TestCase
@@ -26,6 +27,7 @@ class PostTest extends TestCase
         $this->admin = User::factory()->admin()->create();
     }
 
+    #[TestDox('管理者は投稿一覧で4種類すべての投稿を見られる')]
     public function test_admin_can_see_all_types_of_posts_in_list(): void
     {
         $goal = GoalPost::factory()->create(['title' => '目標のタイトル']);
@@ -41,6 +43,7 @@ class PostTest extends TestCase
             ->assertSee('4件');
     }
 
+    #[TestDox('投稿一覧は種類をまたいで新しい順に並ぶ')]
     public function test_list_is_ordered_by_newest_across_post_types(): void
     {
         GoalPost::factory()->create(['title' => '一番古い投稿', 'created_at' => now()->subDays(2)]);
@@ -52,6 +55,7 @@ class PostTest extends TestCase
             ->assertSeeInOrder(['一番新しい投稿', '真ん中の投稿', '一番古い投稿']);
     }
 
+    #[TestDox('タイトル・本文・投稿者名で投稿を検索できる')]
     public function test_admin_can_search_posts_by_title_body_or_user_name(): void
     {
         $taro = User::factory()->create(['name' => '山田太郎']);
@@ -73,6 +77,7 @@ class PostTest extends TestCase
             ->assertDontSee('関係ない投稿');
     }
 
+    #[TestDox('投稿の種類で絞り込める')]
     public function test_admin_can_filter_posts_by_type(): void
     {
         GoalPost::factory()->create(['title' => '目標宣言の投稿']);
@@ -85,6 +90,7 @@ class PostTest extends TestCase
             ->assertSee('<option value="knowledge" selected>', false);
     }
 
+    #[TestDox('存在しない投稿の種類を指定すると入力エラーになる')]
     public function test_invalid_post_type_is_rejected(): void
     {
         $this->actingAs($this->admin)
@@ -92,6 +98,7 @@ class PostTest extends TestCase
             ->assertSessionHasErrors('type');
     }
 
+    #[TestDox('キーワードの % や _ は普通の文字として検索される')]
     public function test_like_wildcards_in_keyword_are_treated_as_characters(): void
     {
         KnowledgePost::factory()->create(['title' => '目標を100%達成']);
@@ -103,6 +110,7 @@ class PostTest extends TestCase
             ->assertDontSee('目標を100点達成');
     }
 
+    #[TestDox('投稿一覧にコメント数といいね数が出る')]
     public function test_list_shows_comment_and_like_counts(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -114,6 +122,7 @@ class PostTest extends TestCase
             ->assertSee('<td class="nowrap">1 / 2</td>', false);
     }
 
+    #[TestDox('投稿一覧で N+1 問題が起きない')]
     public function test_list_does_not_cause_n_plus_one_queries(): void
     {
         $countQueries = function (): int {
@@ -138,6 +147,7 @@ class PostTest extends TestCase
         $this->assertSame($before, $countQueries());
     }
 
+    #[TestDox('投稿日時が同じでも、ページ送りで抜けや重複が出ない')]
     public function test_pagination_is_stable_when_created_at_is_the_same(): void
     {
         $createdAt = now();
@@ -157,6 +167,7 @@ class PostTest extends TestCase
         $this->assertCount($goals->count() + $knowledge->count(), $all);
     }
 
+    #[TestDox('管理者は投稿詳細とコメントを見られる')]
     public function test_admin_can_see_post_detail_with_comments(): void
     {
         $post = KnowledgePost::factory()->create(['title' => '詳細の投稿', 'body' => '詳細の本文']);
@@ -169,6 +180,7 @@ class PostTest extends TestCase
             ->assertSee(route('admin.comments.show', $comment));
     }
 
+    #[TestDox('進捗報告の詳細から、その目標に移れる')]
     public function test_progress_report_detail_links_to_its_goal(): void
     {
         $goal = GoalPost::factory()->create(['title' => '紐づく目標']);
@@ -181,6 +193,7 @@ class PostTest extends TestCase
             ->assertSee(route('admin.posts.show', ['type' => 'goal', 'id' => $goal->id]));
     }
 
+    #[TestDox('目標の削除の確認に、一緒に消える報告の件数が出る')]
     public function test_goal_detail_shows_related_report_counts_in_delete_confirmation(): void
     {
         $goal = GoalPost::factory()->create();
@@ -192,6 +205,7 @@ class PostTest extends TestCase
             ->assertSee('進捗報告2件・達成報告1件と、');
     }
 
+    #[TestDox('存在しない投稿は404になる')]
     public function test_missing_post_returns_404(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -206,6 +220,7 @@ class PostTest extends TestCase
             ->assertNotFound();
     }
 
+    #[TestDox('投稿を削除するとコメントといいねも消える')]
     public function test_deleting_post_also_deletes_comments_and_likes(): void
     {
         $post = KnowledgePost::factory()->create();
@@ -225,6 +240,7 @@ class PostTest extends TestCase
         $this->assertModelExists($other);
     }
 
+    #[TestDox('目標を削除すると進捗報告・達成報告も消える')]
     public function test_deleting_goal_also_deletes_its_reports(): void
     {
         $goal = GoalPost::factory()->create();
@@ -241,6 +257,7 @@ class PostTest extends TestCase
         $this->assertDatabaseCount('comments', 0);
     }
 
+    #[TestDox('一般ユーザーは投稿管理を使えない')]
     public function test_general_user_can_not_manage_posts(): void
     {
         $user = User::factory()->create();
