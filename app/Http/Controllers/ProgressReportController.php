@@ -31,15 +31,15 @@ class ProgressReportController extends Controller
         $validated = $request->validated();
 
         $data = [
+            'goal_post_id' => $goal->id,
             'title' => $validated['title'] ?? null,
             'body' => $validated['body'] ?? null,
             'image_path' => $request->file('image')?->store('progress_images', 'public'),
             'user_id' => Auth::id(),
         ];
 
-        // goal_post_id は目標のリレーション経由で自動で入る
-        $goal->progress_reports()->create($data);
+        $progressReport = ProgressReport::create($data);
 
-        return redirect()->route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
+        return redirect()->route('posts.show', ['type' => 'progress', 'id' => $progressReport->id]);
     }
 }
