@@ -39,9 +39,9 @@
 
         @php
             $demoPosts = [
-                ['type'=>'goal','label'=>'目標宣言','name'=>'Mika S.','initial'=>'M','time'=>'20分前','title'=>'毎日30分、英語学習を続ける！','body'=>'3か月後に海外の人と自然に会話できるようになるのが目標です。まずは毎日、単語とリスニングを少しずつ積み重ねます。','genre'=>'語学・学習','likes'=>24,'comments'=>6],
-                ['type'=>'progress','label'=>'進捗報告','name'=>'Kenta','initial'=>'K','time'=>'1時間前','title'=>'朝活を1週間続けられた','body'=>'最初は起きるのが大変だったけど、寝る前に明日のタスクを決めておくとスムーズでした。小さな工夫が大事だと実感。','genre'=>'習慣化','likes'=>18,'comments'=>3],
-                ['type'=>'knowledge','label'=>'学び共有','name'=>'Yui','initial'=>'Y','time'=>'3時間前','title'=>'勉強した内容を人に説明すると理解が深まる','body'=>'インプットだけで終わらせず、短くても自分の言葉でまとめると、理解できていない部分に気づけます。','genre'=>'勉強法','likes'=>37,'comments'=>9],
+                ['type'=>'goal','label'=>'目標宣言','name'=>'Mika S.','initial'=>'M','time'=>'20分前','title'=>'毎日30分、英語学習を続ける！','body'=>'3か月後に海外の人と自然に会話できるようになるのが目標です。まずは毎日、単語とリスニングを少しずつ積み重ねます。'],
+                ['type'=>'progress','label'=>'進捗報告','name'=>'Kenta','initial'=>'K','time'=>'1時間前','title'=>'朝活を1週間続けられた','body'=>'最初は起きるのが大変だったけど、寝る前に明日のタスクを決めておくとスムーズでした。小さな工夫が大事だと実感。'],
+                ['type'=>'knowledge','label'=>'学び共有','name'=>'Yui','initial'=>'Y','time'=>'3時間前','title'=>'勉強した内容を人に説明すると理解が深まる','body'=>'インプットだけで終わらせず、短くても自分の言葉でまとめると、理解できていない部分に気づけます。'],
             ];
             $feedItems = isset($posts) && count($posts) ? $posts : $demoPosts;
         @endphp
@@ -73,9 +73,8 @@
                 @elseif(data_get($post, 'demo_image'))
                     <div class="post-image">投稿に関連するイメージ</div>
                 @endif
-                <div style="margin-top:12px"><span class="tag">{{ data_get($post, 'genre.name', data_get($post, 'genre', '学び・成長')) }}</span></div>
                 <div class="post-footer">
-                    @include('posts._like-button', [
+                    @include('posts._like-button', [ 
                         'type' => $type,
                         'id' => $id,
                         'liked' => (bool) data_get($post, 'liked', false),
@@ -94,13 +93,7 @@
     </main>
 
     <aside class="rightbar">
-        <section class="rightbar-section">
-            <h3>🔥 注目のジャンル</h3>
-            <div class="trend"><span class="trend-num">01</span><div><strong>勉強・資格</strong><div class="post-meta">今日の投稿 128件</div></div></div>
-            <div class="trend"><span class="trend-num">02</span><div><strong>習慣化</strong><div class="post-meta">今日の投稿 86件</div></div></div>
-            <div class="trend"><span class="trend-num">03</span><div><strong>キャリア</strong><div class="post-meta">今日の投稿 64件</div></div></div>
-            <a class="btn btn-outline btn-block" href="{{ url('/search') }}">ジャンルを探す</a>
-        </section>
+        
         <section class="rightbar-section">
             <h3>🌱 今日のヒント</h3>
             <p style="color:var(--muted);margin:0">大きな目標も、小さな一歩の積み重ね。今日できたことを記録してみよう。</p>

@@ -36,6 +36,6 @@ class DashboardTest extends TestCase
             ->assertViewHas('postCounts', ['目標宣言' => 2, '進捗報告' => 3, '達成報告' => 1, '学び共有' => 1])
             ->assertViewHas('todayCommentCount', 4)
             ->assertSee('管理者ダッシュボード')
-            ->assertDontSee('気になる投稿やジャンルを検索');
+            ->assertDontSee('気になる投稿を検索');
     }
 }
