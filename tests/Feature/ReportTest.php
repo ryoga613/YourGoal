@@ -140,11 +140,12 @@ class ReportTest extends TestCase
             ->get(route('achievement-reports.create', $goal))
             ->assertOk();
 
-        $this->actingAs($this->user)
-            ->post(route('achievement-reports.store', $goal), ['title' => '完走できた！', 'body' => '目標達成'])
-            ->assertRedirect($this->goalUrl($goal));
+        $response = $this->actingAs($this->user)
+            ->post(route('achievement-reports.store', $goal), ['title' => '完走できた！', 'body' => '目標達成']);
 
         $report = $goal->achievement_reports()->sole();
+        // 達成報告のあとは、作った達成報告の詳細に移る
+        $response->assertRedirect(route('posts.show', ['type' => 'achievement', 'id' => $report->id]));
         $this->assertSame($this->user->id, $report->user_id);
         $this->assertSame('完走できた！', $report->title);
         $this->assertSame(GoalPostStatus::Achieved, $goal->fresh()->status);
