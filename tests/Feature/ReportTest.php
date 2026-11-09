@@ -34,11 +34,6 @@ class ReportTest extends TestCase
         return GoalPost::factory()->for($owner ?? $this->user)->create(['status' => $status]);
     }
 
-    private function goalUrl(GoalPost $goal): string
-    {
-        return route('posts.show', ['type' => 'goal', 'id' => $goal->id]);
-    }
-
     public static function allStatuses(): array
     {
         return [
@@ -77,15 +72,16 @@ class ReportTest extends TestCase
             ->get(route('progress-reports.create', $goal))
             ->assertOk();
 
-        $this->actingAs($this->user)
+        $response = $this->actingAs($this->user)
             ->post(route('progress-reports.store', $goal), [
                 'title' => '1週間続いた',
                 'body' => '朝に走るのが習慣になった',
                 'image' => UploadedFile::fake()->image('run.png'),
-            ])
-            ->assertRedirect($this->goalUrl($goal));
+            ]);
 
         $report = $goal->progress_reports()->sole();
+        // 進捗報告のあとは、作った進捗報告の詳細に移る
+        $response->assertRedirect(route('posts.show', ['type' => 'progress', 'id' => $report->id]));
         $this->assertSame($this->user->id, $report->user_id);
         $this->assertSame('1週間続いた', $report->title);
         $this->assertStringStartsWith('progress_images/', $report->image_path);
