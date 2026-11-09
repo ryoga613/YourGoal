@@ -14,7 +14,7 @@ use App\Models\User;
 class DashboardController extends Controller
 {
     /**
-     * ユーザー数・投稿数・コメント数・ジャンル数を表示
+     * ユーザー数・投稿数・コメント数を表示
      */
     public function index()
     {

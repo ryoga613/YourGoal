@@ -36,7 +36,7 @@ class PostController extends Controller
     }
 
     /**
-     * 投稿者・内容・画像・ジャンル・いいね・コメントを表示
+     * 投稿者・内容・画像・いいね・コメントを表示
      */
     public function show(string $type, int $id)
     {
