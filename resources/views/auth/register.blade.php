@@ -2,7 +2,7 @@
 @section('title', '新規登録')
 @section('content')
 <div class="auth-wrap"><div class="auth-card">
-    <div class="brand" style="margin-bottom:22px"><span class="brand-mark">G</span>growly</div>
+    <div class="brand" style="margin-bottom:22px"><span class="brand-mark">Y</span>YourGoal</div>
     <h1>一緒に成長を始めよう</h1><p class="subheading">アカウントを作成して、最初の一歩をシェアしよう。</p>
     @if($errors->any())<div class="alert">{{ $errors->first() }}</div>@endif
     <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('register.store') ? route('register.store') : url('/register') }}">

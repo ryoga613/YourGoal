@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Growly') | Growly</title>
+    <title>@yield('title', 'YourGoal') | YourGoal</title>
     <style>
         :root {
             --blue: #3563e9;
@@ -811,7 +811,7 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="{{ auth()->check() ? auth()->user()->role->homePath() : route('login') }}"><span class="brand-mark">G</span>growly</a>
+    <a class="brand" href="{{ auth()->check() ? auth()->user()->role->homePath() : route('login') }}"><span class="brand-mark">Y</span>YourGoal</a>
     {{-- 検索は一般ユーザー向けの機能のため、管理者には表示しない --}}
     @unless(auth()->user()?->isAdmin())
     <form class="top-search" method="GET" action="{{ \Illuminate\Support\Facades\Route::has('posts.search') ? route('posts.search') : url('/search') }}">
@@ -836,7 +836,7 @@
     </div>
 </header>
 @yield('content')
-<footer class="footer">© {{ date('Y') }} Growly — 小さな一歩を、みんなの成長に。</footer>
+<footer class="footer">© {{ date('Y') }} YourGoal — 小さな一歩を、みんなの成長に。</footer>
 <script>
     // ブラウザ標準の入力チェック（required / type="email" / minlength）のメッセージを日本語で統一する
     document.addEventListener('invalid', (event) => {

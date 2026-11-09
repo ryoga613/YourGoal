@@ -2,7 +2,7 @@
 @section('title', '管理者ダッシュボード')
 @section('content')
 <div class="admin-shell">
-    <div class="page-heading"><div><h1>管理者ダッシュボード</h1><p class="subheading">Growlyの利用状況を確認できます。</p></div></div>
+    <div class="page-heading"><div><h1>管理者ダッシュボード</h1><p class="subheading">YourGoalの利用状況を確認できます。</p></div></div>
     <div class="stats-grid">
         <div class="stat-card"><div class="stat-label">ユーザー数</div><div class="stat-value">{{ number_format($userCount) }}</div></div>
         <div class="stat-card">

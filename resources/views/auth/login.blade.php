@@ -2,7 +2,7 @@
 @section('title', 'ログイン')
 @section('content')
 <div class="auth-wrap"><div class="auth-card">
-    <div class="brand" style="margin-bottom:22px"><span class="brand-mark">G</span>growly</div>
+    <div class="brand" style="margin-bottom:22px"><span class="brand-mark">Y</span>YourGoal</div>
     <h1>おかえりなさい</h1><p class="subheading">ログインして、みんなの成長を見てみよう。</p>
     @if($errors->any())<div class="alert">{{ $errors->first() }}</div>@endif
     <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('login.store') ? route('login.store') : url('/login') }}">
