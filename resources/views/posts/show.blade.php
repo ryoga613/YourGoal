@@ -38,6 +38,10 @@
             @if(data_get($post,'image_path'))
                 <img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">
             @endif
+            {{-- 進捗報告・達成報告は、どの目標の報告かが分かるように元の目標宣言へのリンクを出す --}}
+            @if(in_array($post->postType(), [\App\Enums\PostType::Progress, \App\Enums\PostType::Achievement], true) && $post->goal_post)
+                <a class="btn btn-light btn-sm" style="margin-top:14px" href="{{ route('posts.show', ['type' => \App\Enums\PostType::Goal->value, 'id' => $post->goal_post->id]) }}">◎ 目標「{{ $post->goal_post->title }}」を見る</a>
+            @endif
             <div class="post-footer">
                 @include('posts._like-button', [
                     'type' => request()->route('type'),
