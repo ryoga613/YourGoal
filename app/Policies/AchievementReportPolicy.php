@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Enums\GoalPostStatus;
-use App\Enums\UserRole;
 use App\Models\AchievementReport;
 use App\Models\GoalPost;
 use App\Models\User;
@@ -36,10 +35,10 @@ class AchievementReportPolicy
     }
 
     /**
-     * 投稿を削除できるのは投稿した本人　　or 管理者だけ
+     * 投稿を削除できるのは投稿した本人だけ（管理者の削除は管理画面から行う）
      */
     public function delete(User $user, AchievementReport $post): bool
     {
-        return $user->id == $post->user_id || $user->role === UserRole::Admin;
+        return $user->id == $post->user_id;
     }
 }

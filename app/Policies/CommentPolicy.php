@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\UserRole;
 use App\Models\Comment;
 use App\Models\User;
 
@@ -33,10 +32,10 @@ class CommentPolicy
     }
 
     /**
-     * コメントを削除できるのは書いた本人 or 管理者だけ
+     * コメントを削除できるのは書いた本人だけ（管理者の削除は管理画面から行う）
      */
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->id === $comment->user_id || $user->role === UserRole::Admin;
+        return $user->id === $comment->user_id;
     }
 }
