@@ -34,13 +34,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
         ]);
 
-        $users = User::factory(10)->create()->push($testUser);
+        $users = User::factory(1000)->create()->push($testUser);
 
-        $goalPosts = GoalPost::factory(30)->recycle($users)->create();
-        $knowledgePosts = KnowledgePost::factory(15)->recycle($users)->create();
+        $goalPosts = GoalPost::factory(4000)->recycle($users)->create();
+        $knowledgePosts = KnowledgePost::factory(2000)->recycle($users)->create();
 
         // 進捗報告・達成報告の投稿者は、Factory側で目標の投稿者に揃えられる
-        $progressReports = ProgressReport::factory(40)->recycle($goalPosts)->create();
+        $progressReports = ProgressReport::factory(6000)->recycle($goalPosts)->create();
 
         // 達成報告は達成済みの目標にだけ作る
         $achievementReports = $goalPosts
@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 一部のコメントに返信をつける
-        $comments->random(min(20, $comments->count()))->each(
+        $comments->random(min(2000, $comments->count()))->each(
             fn (Comment $comment) => Comment::factory()->replyTo($comment)->recycle($users)->create()
         );
 
