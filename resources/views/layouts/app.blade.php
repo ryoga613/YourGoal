@@ -160,6 +160,8 @@
             place-items: center;
             font-weight: 800;
             flex-shrink: 0;
+            /* プロフィール画像（img.avatar）を丸の中に切り抜いて収める */
+            object-fit: cover;
         }
 
 
@@ -824,7 +826,10 @@
             @if(auth()->user()->isAdmin())
                 <a class="btn btn-light" href="{{ route('admin.dashboard') }}">管理画面</a>
             @else
-                <a href="{{ \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : url('/profile/edit') }}" class="avatar" aria-label="プロフィール">{{ mb_substr(auth()->user()->name ?? 'U', 0, 1) }}</a>
+                <a href="{{ \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : url('/profile/edit') }}" style="display:inline-flex" aria-label="プロフィール">
+                    {{-- ログイン中のユーザーは auth()->user() で取る（画面ごとに $user を渡さなくてよい） --}}
+                    <x-avatar :user="auth()->user()" />
+                </a>
             @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

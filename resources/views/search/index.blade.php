@@ -31,7 +31,7 @@
                 @php($postType = $post->postType())
                 <article class="post-card">
                     <div class="post-head">
-                        <div class="avatar">{{ mb_substr($post->user?->name ?? 'U', 0, 1) }}</div>
+                        <x-avatar :user="$post->user" />
                         <div>
                             <div class="post-author">
                                 {{ $post->user?->name ?? '退会済みユーザー' }}
