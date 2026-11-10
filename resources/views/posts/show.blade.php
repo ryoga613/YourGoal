@@ -7,7 +7,7 @@
         <a href="{{ url('/') }}" class="post-meta">← ホームに戻る</a>
         <article class="post-card" style="margin-top:15px">
             <div class="post-head">
-                <div class="avatar">{{ mb_substr(data_get($post,'user.name','U'),0,1) }}</div>
+                <x-avatar :user="$post->user" />
                 <div>
                     <div class="post-author">{{ data_get($post,'user.name','ユーザー') }}</div>
                     <div class="post-meta">{{ data_get($post,'created_at') }}</div>

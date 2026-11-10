@@ -23,7 +23,7 @@
             <a class="btn btn-primary" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}">＋ 投稿する</a>
         </div>
         <div class="composer">
-            <div class="avatar">{{ mb_substr(auth()->user()->name ?? 'G', 0, 1) }}</div>
+            <x-avatar :user="auth()->user()" />
             <div style="flex:1">
                 <a class="composer-prompt" style="display:block" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}">今、取り組んでいることは？</a>
                 <div class="composer-actions">
@@ -54,12 +54,12 @@
                 $title = data_get($post, 'title', '投稿タイトル');
                 $body = data_get($post, 'body', data_get($post, 'content', '投稿本文がここに表示されます。'));
                 $author = data_get($post, 'user.name', data_get($post, 'name', 'ユーザー'));
-                $initial = mb_substr($author, 0, 1);
                 $id = data_get($post, 'id');
             @endphp
             <article class="post-card">
                 <div class="post-head">
-                    <div class="avatar">{{ $initial }}</div>
+                    {{-- 見本の投稿（配列）には user が無いので、名前の頭文字を出す --}}
+                    <x-avatar :user="data_get($post, 'user')" :name="$author" />
                     <div><div class="post-author">{{ $author }}</div><div class="post-meta">{{ data_get($post, 'created_at') ? \Illuminate\Support\Carbon::parse(data_get($post, 'created_at'))->diffForHumans() : data_get($post, 'time', '最近') }}</div></div>
                     <span class="tag {{ $tagClass }}" style="margin-left:8px">{{ $label }}</span>
                 </div>

@@ -30,11 +30,7 @@
         {{-- プロフィールカード --}}
         <section class="post-card">
             <div class="post-head" style="align-items:flex-start">
-                @if ($user->profile_image_path)
-                    <img class="avatar" src="{{ asset('storage/'.$user->profile_image_path) }}" alt="{{ $user->name }}さんのプロフィール画像" style="width:72px;height:72px;object-fit:cover">
-                @else
-                    <div class="avatar" style="width:72px;height:72px;font-size:28px">{{ mb_substr($user->name, 0, 1) }}</div>
-                @endif
+                <x-avatar :user="$user" :size="72" />
                 <div style="flex:1;min-width:0">
                     <h1 style="font-size:22px;margin:4px 0 6px">{{ $user->name }}</h1>
                     <div class="post-meta">{{ $user->created_at?->format('Y年n月') }}から参加</div>

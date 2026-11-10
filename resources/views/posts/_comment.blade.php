@@ -11,7 +11,7 @@
 {{-- 返信は親の中に入れ子で描画されるので、字下げは1階層ぶん（28px）ずつ積み重なる。深くなりすぎないよう3階層目まで --}}
 <div id="comment-{{ $comment->id }}" style="padding:14px 0 0 {{ $depth >= 1 && $depth <= 3 ? 28 : 0 }}px;border-top:1px solid var(--line)">
     <div style="display:flex;gap:10px">
-        <div class="avatar">{{ mb_substr($comment->user?->name ?? 'U', 0, 1) }}</div>
+        <x-avatar :user="$comment->user" />
         <div style="flex:1;min-width:0">
             <strong>{{ $comment->user?->name ?? '退会済みユーザー' }}</strong>
             <div class="post-meta">
