@@ -26,7 +26,8 @@ class DashboardTest extends TestCase
         ProgressReport::factory(3)->recycle($goalPosts)->create();
         AchievementReport::factory()->for($goalPosts->first(), 'goal_post')->create();
         $knowledgePost = KnowledgePost::factory()->recycle($users)->create();
-        Comment::factory(4)->forPost($knowledgePost)->recycle($users)->create();
+        // Factory はコメントの日時を過去にばらけさせるので、今日のコメントは日時を指定する
+        Comment::factory(4)->forPost($knowledgePost)->recycle($users)->create(['created_at' => now()]);
         // 昨日のコメントは今日のコメント数に含めない
         Comment::factory()->forPost($knowledgePost)->recycle($users)->create(['created_at' => now()->subDay()]);
 
