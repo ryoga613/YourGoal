@@ -10,7 +10,7 @@ use App\Models\GoalPost;
 use App\Models\KnowledgePost;
 use App\Models\ProgressReport;
 use App\Support\EscapeLike;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -32,21 +32,16 @@ class PostController extends Controller
         $type = isset($validated['type']) ? PostType::from($validated['type']) : null;
 
         // ① 検索する投稿の種類を決める(選ばれていればその種類だけ、なければ全種類)
-        if ($type) {
-            $types = [$type];
-        } else {
-            $types = PostType::cases();
-        }
+        $types = $type ? [$type] : PostType::cases();
 
-        // ② 種類ごとに投稿を取ってきて、1つの箱にまとめる
-        $allPosts = collect();
+        // ② 種類ごとに「種類・ID・投稿日時」だけを取るクエリを作り、UNION ALL で1つにまとめる
+        $union = null;
 
         foreach ($types as $postType) {
-            $modelClass = $postType->modelClass(); // 例: GoalPost::class
-
-            $query = $modelClass::query()
-                ->with('user')
-                ->withCount(self::COUNT_RELATIONS);
+            $query = $postType->modelClass()::query()
+                ->toBase()
+                ->selectRaw('? as type', [$postType->value])
+                ->addSelect(['id', 'created_at']);
 
             // キーワードがあれば、タイトルか本文か投稿者の名前で絞り込む
             if ($keyword) {
@@ -56,35 +51,41 @@ class PostController extends Controller
                 $query->where(function ($q) use ($pattern) {
                     $q->where('title', 'like', $pattern)
                         ->orWhere('body', 'like', $pattern)
-                        // 投稿者の名前は users テーブルにあるため、user リレーションをたどって検索する
-                        ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', $pattern));
+                        // 投稿者の名前は users テーブルにあるため、users を user_id で探して検索する
+                        ->orWhereIn('user_id', fn ($userQuery) => $userQuery
+                            ->select('id')
+                            ->from('users')
+                            ->where('name', 'like', $pattern));
                 });
             }
 
-            foreach ($query->get() as $post) {
-                $allPosts->push([
-                    'type' => $postType,
-                    'post' => $post,
-                ]);
-            }
+            $union = $union ? $union->unionAll($query) : $query;
         }
 
-        // ③ 新しい順に並べる
-        $allPosts = $allPosts
-            ->sortByDesc(fn ($item) => $item['post']->created_at)
-            ->values();
+        // ③ 新しい順に並べて、DB で20件ずつページ分けする
+        // 投稿日時が同じでもページ送りで抜けや重複が出ないよう、種類とIDでも並べる
+        $rows = DB::query()
+            ->fromSub($union, 'posts')
+            ->orderByDesc('created_at')
+            ->orderBy('type')
+            ->orderByDesc('id')
+            ->paginate(20)
+            ->withQueryString();
 
-        // ④ 20件ずつページ分けする
-        $perPage = 20;
-        $page = $request->input('page', 1);
+        // ④ このページに出る投稿だけを、種類ごとにまとめて取ってくる
+        $postsByType = $rows->getCollection()
+            ->groupBy('type')
+            ->map(fn ($items, $value) => PostType::from($value)->modelClass()::query()
+                ->with('user')
+                ->withCount(self::COUNT_RELATIONS)
+                ->findMany($items->pluck('id'))
+                ->keyBy('id'));
 
-        $posts = new LengthAwarePaginator(
-            $allPosts->forPage($page, $perPage), // このページに表示する20件
-            $allPosts->count(),                  // 全部で何件か
-            $perPage,                            // 1ページの件数
-            $page,                               // 今のページ番号
-            ['path' => $request->url(), 'query' => $request->query()] // 検索条件を引き継ぐ
-        );
+        // ⑤ ページ分けした順番のまま、画面で使う形（種類と投稿）に置き換える
+        $posts = $rows->through(fn ($row) => [
+            'type' => PostType::from($row->type),
+            'post' => $postsByType[$row->type][$row->id],
+        ]);
 
         return view('admin.posts.index', [
             'posts' => $posts,
