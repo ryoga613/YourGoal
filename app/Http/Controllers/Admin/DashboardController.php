@@ -31,8 +31,12 @@ class DashboardController extends Controller
             'userCount' => User::where('role', UserRole::User)->count(),
             'postCount' => array_sum($postCounts),
             'postCounts' => $postCounts,
-            // 返信も含めたコメント総数
-            'todayCommentCount' => Comment::whereDate('created_at', today())->count(),
+            // 今日のコメント数（返信も含む）
+            // whereDate は DATE(created_at) と関数を通して比べるためインデックスが使えない。
+            // 「今日の0時以上・明日の0時より前」の範囲で比べれば、created_at のインデックスが使える
+            'todayCommentCount' => Comment::where('created_at', '>=', today())
+                ->where('created_at', '<', today()->addDay())
+                ->count(),
         ]);
     }
 }
