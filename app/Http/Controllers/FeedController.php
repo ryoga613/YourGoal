@@ -8,8 +8,8 @@ use App\Models\GoalPost;
 use App\Models\KnowledgePost;
 use App\Models\ProgressReport;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class FeedController extends Controller
@@ -27,46 +27,51 @@ class FeedController extends Controller
 
         // ?sort=latest なら新着順、それ以外はおすすめ（いいねの多い順）
         $sort = $request->query('sort') === 'latest' ? 'latest' : 'popular';
-        $perPage = 20;
-        $page = LengthAwarePaginator::resolveCurrentPage();
 
-        // どの種類が上位に来るかわからないので、各種類から「今のページまでの件数」を取っておく
-        $take = $page * $perPage;
-        $total = 0;
-        $posts = collect();
-
-        // 4種類の投稿を取り、Blade でリンクを作れるよう type を付けてまとめる
+        // 4種類の投稿の「id・種類・投稿日時・いいね数」だけを UNION ALL で1つの表にまとめる
+        $feed = null;
         foreach (PostType::cases() as $postType) {
-            $total += $postType->modelClass()::count();
+            $query = $postType->modelClass()::query()
+                ->select('id', 'created_at')
+                ->selectRaw('? as type', [$postType->value])
+                ->withCount('post_likes');
 
-            $query = $postType->modelClass()::with('user')
-                ->withCount(['post_likes', 'comments'])
-                // ログイン中のユーザーがいいね済みかどうか（$post->liked に true / false が入る）
-                ->withExists(['post_likes as liked' => fn ($q) => $q->where('user_id', Auth::id())]);
-
-            if ($sort === 'latest') {
-                $query->latest()->latest('id');
-            } else {
-                $query->orderByDesc('post_likes_count')->latest();
-            }
-
-            foreach ($query->take($take)->get() as $post) {
-                $post->type = $postType->value;
-                $posts->push($post);
-            }
+            $feed = $feed ? $feed->unionAll($query) : $query;
         }
 
-        $posts = $sort === 'latest'
-            ? $posts->sortByDesc('created_at')
-            : $posts->sortBy([['post_likes_count', 'desc'], ['created_at', 'desc']]);
+        // 並べ替えとページ分けは DB に任せ、このページの20件分の id だけを受け取る
+        $feed = DB::query()->fromSub($feed, 'feed');
 
-        $posts = new LengthAwarePaginator(
-            $posts->forPage($page, $perPage)->values(), // このページに表示する20件
-            $total,                                     // 4種類の合計件数
-            $perPage,
-            $page,
-            ['path' => $request->url(), 'query' => $request->query()] // ?sort=latest をページリンクに引き継ぐ
-        );
+        if ($sort === 'latest') {
+            $feed->orderByDesc('created_at');
+        } else {
+            $feed->orderByDesc('post_likes_count')->orderByDesc('created_at');
+        }
+
+        $posts = $feed->orderBy('type')->orderByDesc('id') // 同じ値のときも順番がぶれないように
+            ->paginate(20)
+            ->withQueryString(); // ?sort=latest をページリンクに引き継ぐ
+
+        // 20件分だけ、種類ごとに本体を読み込む
+        $models = $posts->getCollection()
+            ->groupBy('type')
+            ->map(fn ($rows, $type) => PostType::from($type)->modelClass()::with('user')
+                ->withCount(['post_likes', 'comments'])
+                // ログイン中のユーザーがいいね済みかどうか（$post->liked に true / false が入る）
+                ->withExists(['post_likes as liked' => fn ($q) => $q->where('user_id', Auth::id())])
+                ->findMany($rows->pluck('id'))
+                ->keyBy('id'));
+
+        // DB が決めた並び順のまま、モデルに差し替える（Blade でリンクを作れるよう type を付ける）
+        $posts->setCollection($posts->getCollection()
+            ->map(function ($row) use ($models) {
+                $post = $models[$row->type][$row->id] ?? null; // 読み込みの間に削除された投稿は飛ばす
+                $post?->setAttribute('type', $row->type);
+
+                return $post;
+            })
+            ->filter()
+            ->values());
 
         return view('home', compact('posts', 'sort'));
     }
