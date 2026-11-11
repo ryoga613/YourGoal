@@ -40,4 +40,26 @@ class DashboardTest extends TestCase
             ->assertSee('管理者ダッシュボード')
             ->assertDontSee('気になる投稿を検索');
     }
+
+    #[TestDox('今日のコメント数は、今日の0時から23:59:59までのコメントを数える')]
+    public function test_today_comment_count_includes_only_today(): void
+    {
+        $this->travelTo(now()->setDate(2026, 11, 11)->setTime(12, 0));
+
+        $admin = User::factory()->admin()->create();
+        $knowledgePost = KnowledgePost::factory()->create();
+
+        $createCommentAt = fn (string $datetime) => Comment::factory()
+            ->forPost($knowledgePost)
+            ->create(['created_at' => $datetime]);
+
+        $createCommentAt('2026-11-10 23:59:59'); // 昨日の最後 → 数えない
+        $createCommentAt('2026-11-11 00:00:00'); // 今日の最初 → 数える
+        $createCommentAt('2026-11-11 23:59:59'); // 今日の最後 → 数える
+        $createCommentAt('2026-11-12 00:00:00'); // 明日の最初 → 数えない
+
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertViewHas('todayCommentCount', 2);
+    }
 }
