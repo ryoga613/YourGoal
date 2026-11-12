@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PostType;
 use App\Http\Requests\SearchIndexRequest;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
@@ -17,40 +17,44 @@ class SearchController extends Controller
         $validated = $request->validated();
         $keyword = $validated['keyword'] ?? null;
 
-        // type が指定されていればその種類だけ、なければ4種類すべてを検索する
-        $types = isset($validated['type'])
-            ? [PostType::from($validated['type'])]
-            : PostType::cases();
+        $PostRaws = null;
 
-        $perPage = 20;
-        $page = LengthAwarePaginator::resolveCurrentPage();
-
-        // どの種類が上位に来るかわからないので、各種類から「今のページまでの件数」を取っておく
-        $take = $page * $perPage;
-        $total = 0;
-        $posts = collect();
-
-        foreach ($types as $postType) {
-            $query = $postType->modelClass()::query()
+        // $types に入っている種類の分だけ(選ばれていれば1つ、なければ4つ全部)、
+        // テーブルごとに「type(名札)・id・created_at」を取るクエリを作って、縦に積み重ねる
+        $types = isset($validated['type']) ? [PostType::from($validated['type'])] : PostType::cases();
+        foreach ($types as $type) {
+            $query = $type->modelClass()::query()
+                ->selectRaw('? as type', [$type->value])
+                ->addSelect(['id', 'created_at'])
+                // キーワードが入力されていれば、タイトル・本文・投稿者名で絞り込む
                 ->when($keyword !== null, fn (Builder $q) => $this->whereKeyword($q, $keyword));
 
-            // 件数は絞り込み後・取得前に数える（take() を付ける前のクエリで数える）
-            $total += (clone $query)->count();
-
-            $posts = $posts->concat(
-                $query->with('user')->latest()->latest('id')->take($take)->get()
-            );
+            $PostRaws = $PostRaws ? $PostRaws->unionAll($query) : $query;
         }
+        $posts = DB::query()
+            ->fromSub($PostRaws, 'posts')    // 混ぜた全体を「posts」テーブルとして扱う
+            ->orderByDesc('created_at')   // その posts を新しい順に並べる
+            ->orderByDesc('id')           // 同じ時刻なら id の大きい順（ページの境目で重複・抜けを防ぐ）
+            ->paginate(20)                // その posts から20件取る
+            ->withQueryString();          // キーワード・種類をページリンクに引き継ぐ
 
-        $posts = new LengthAwarePaginator(
-            $posts->sortByDesc('created_at')->forPage($page, $perPage)->values(), // このページの20件
-            $total,                                                               // 検索にヒットした合計件数
-            $perPage,
-            $page,
-            ['path' => $request->url(), 'query' => $request->query()] // 検索条件をページリンクに引き継ぐ
-        );
+        $models = $posts->getCollection()
+            ->groupBy('type')
+            ->map(fn ($rows, $type) => PostType::from($type)->modelClass()::with('user')
+                ->findMany($rows->pluck('id'))
+                ->keyBy('id'));
 
-        return view('search.index', compact('posts', 'keyword'));
+        // DB が決めた並び順のまま、stdClass をモデルに差し替える
+        $posts->setCollection($posts->getCollection()
+            ->map(fn ($row) => $models[$row->type][$row->id] ?? null)
+            ->filter()
+            ->values());
+
+        return view('search.index', [
+            'posts' => $posts,
+            'keyword' => $keyword,
+        ]);
+
     }
 
     /**
