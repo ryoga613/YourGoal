@@ -32,8 +32,8 @@ class ProfileTest extends TestCase
         $this->get(route('users.show', $this->user))->assertRedirect(route('login'));
     }
 
-    #[TestDox('プロフィールに投稿数が出て、投稿は1ページ10件ずつ並ぶ')]
-    public function test_profile_shows_post_count_and_10_posts_per_page(): void
+    #[TestDox('プロフィールに投稿数が出て、投稿は1ページ5件ずつ並ぶ')]
+    public function test_profile_shows_post_count_and_5_posts_per_page(): void
     {
         KnowledgePost::factory()->for($this->user)->count(11)->create();
         GoalPost::factory()->for($this->user)->create(['title' => '一番新しい目標', 'created_at' => now()->addMinute()]);
@@ -43,9 +43,9 @@ class ProfileTest extends TestCase
             ->assertOk()
             ->assertSeeText('12 投稿')
             ->assertSee('一番新しい目標')
-            // 1ページ10件なので、12件だと2ページ目までになる（2件ずつだと6ページになってしまう）
-            ->assertSee(route('users.show', $this->user).'?page=2', false)
-            ->assertDontSee(route('users.show', $this->user).'?page=3', false);
+            // 1ページ5件なので、12件だと3ページ目までになる（10件ずつだと2ページで終わってしまう）
+            ->assertSee(route('users.show', $this->user).'?page=3', false)
+            ->assertDontSee(route('users.show', $this->user).'?page=4', false);
     }
 
     // ---- 編集 ----
