@@ -28,13 +28,14 @@ class FeedController extends Controller
         // ?sort=latest なら新着順、それ以外はおすすめ（いいねの多い順）
         $sort = $request->query('sort') === 'latest' ? 'latest' : 'popular';
 
-        // 4種類の投稿の「id・種類・投稿日時・いいね数」だけを UNION ALL で1つの表にまとめる
+        // 4種類の投稿の「id・種類・投稿日時」だけを UNION ALL で1つの表にまとめる
+        // いいね数はおすすめ順の並べ替えにだけ使うので、おすすめ順のときだけ数える
         $feed = null;
         foreach (PostType::cases() as $postType) {
             $query = $postType->modelClass()::query()
                 ->select('id', 'created_at')
                 ->selectRaw('? as type', [$postType->value])
-                ->withCount('post_likes');
+                ->when($sort === 'popular', fn ($q) => $q->withCount('post_likes'));
 
             $feed = $feed ? $feed->unionAll($query) : $query;
         }
@@ -48,8 +49,12 @@ class FeedController extends Controller
             $feed->orderByDesc('post_likes_count')->orderByDesc('created_at');
         }
 
+        // 全部で何件かは、いいね数を数えずに種類ごとの件数を足して求める
+        // （paginate に任せると、件数を出すためだけに全投稿のいいね数まで数えてしまう）
+        $total = collect(PostType::cases())->sum(fn (PostType $postType) => $postType->modelClass()::count());
+
         $posts = $feed->orderBy('type')->orderByDesc('id') // 同じ値のときも順番がぶれないように
-            ->paginate(20)
+            ->paginate(20, total: $total)
             ->withQueryString(); // ?sort=latest をページリンクに引き継ぐ
 
         // 20件分だけ、種類ごとに本体を読み込む
