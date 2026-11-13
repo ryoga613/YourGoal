@@ -179,7 +179,7 @@ erDiagram
 | 認証 | Laravel Fortify（登録・ログイン・ログアウト） |
 | データベース | MySQL 8.4 |
 | 開発環境 | Laravel Sail（Docker） |
-| 開発用ツール | phpMyAdmin、Mailpit、Laravel Debugbar |
+| 開発用ツール | phpMyAdmin、Mailpit |
 | テスト | PHPUnit |
 | コード整形 | Laravel Pint |
 
@@ -211,7 +211,7 @@ docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd):/var/www/html" \
     -w /var/www/html \
-    laravelsail/php85-composer:latest \
+    laravelsail/php84-composer:latest \
     composer install --ignore-platform-reqs
 ```
 
@@ -247,7 +247,7 @@ DB_PASSWORD=password
 ./vendor/bin/sail artisan key:generate
 
 # テーブルを作り、テストデータを入れる
-./vendor/bin/sail artisan migrate --seed
+./vendor/bin/sail artisan migrate:fresh --seed
 
 # アップロードした画像を表示できるようにする
 ./vendor/bin/sail artisan storage:link
