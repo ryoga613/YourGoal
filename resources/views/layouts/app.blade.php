@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'YourGoal') | YourGoal</title>
+    {{-- ブラウザのタブに出すアイコン。ヘッダーのロゴマークと同じデザイン --}}
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <script>
         // 夜（19時〜翌6時）は背景を黒・文字を白にする（見ている人の端末の時刻で判断する）
         // 画面を描く前に決めておき、一瞬だけ白い画面が見えるのを防ぐため <head> の中で実行する

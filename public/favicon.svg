@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- ヘッダーのロゴマーク（.brand-mark）と同じ、オレンジの角丸の四角に白い「Y」 -->
+  <rect width="64" height="64" rx="20" fill="#d9620f"/>
+  <text x="32" y="46" text-anchor="middle" font-family="'Hiragino Mincho ProN','Yu Mincho',YuMincho,serif" font-size="40" font-weight="700" fill="#fff">Y</text>
+</svg>
