@@ -7,13 +7,15 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * 一般ユーザーのみ通過させる（管理者は一般ユーザーの操作ができない）
+ * 管理者を通さない（管理者は一般ユーザーの操作ができない）
+ *
+ * ゲストは通す。ログインを必須にする画面は auth と組み合わせる
  */
 class EnsureUserIsGeneral
 {
     public function handle(Request $request, Closure $next): Response
     {
-        abort_unless($request->user()?->isGeneral(), Response::HTTP_FORBIDDEN);
+        abort_if($request->user()?->isAdmin(), Response::HTTP_FORBIDDEN);
 
         return $next($request);
     }

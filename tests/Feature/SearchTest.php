@@ -24,10 +24,10 @@ class SearchTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    #[TestDox('ゲストはログイン画面に送られる')]
-    public function test_guest_is_redirected_to_login(): void
+    #[TestDox('ゲストも検索できる')]
+    public function test_guest_can_search(): void
     {
-        $this->get(route('posts.search'))->assertRedirect(route('login'));
+        $this->get(route('posts.search'))->assertOk();
     }
 
     #[TestDox('条件なしで検索すると4種類すべての投稿が出る')]

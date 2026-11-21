@@ -313,12 +313,12 @@ class PostShowTest extends TestCase
 
     // ---- ゲスト ----
 
-    #[TestDox('ゲストはログイン画面に送られる')]
-    public function test_guest_is_redirected_to_login(): void
+    #[TestDox('ゲストも投稿詳細を見られる')]
+    public function test_guest_can_view_post(): void
     {
         $goal = GoalPost::factory()->create();
 
-        $this->get($this->showUrl(PostType::Goal, $goal->id))->assertRedirect(route('login'));
+        $this->get($this->showUrl(PostType::Goal, $goal->id))->assertOk()->assertSee($goal->title);
     }
 
     #[TestDox('存在しない投稿は404になる')]

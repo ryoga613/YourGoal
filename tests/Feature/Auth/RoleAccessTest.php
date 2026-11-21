@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\GoalPost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -11,11 +12,26 @@ class RoleAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[TestDox('ゲストはログイン画面に送られる')]
-    public function test_guest_is_redirected_to_login(): void
+    #[TestDox('ゲストもホームを開ける')]
+    public function test_guest_can_access_home(): void
     {
-        $this->get('/')->assertRedirect(route('login'));
+        $this->get('/')->assertOk();
+    }
+
+    #[TestDox('ゲストは管理画面を開くとログイン画面に送られる')]
+    public function test_guest_is_redirected_to_login_from_admin(): void
+    {
         $this->get('/admin')->assertRedirect(route('login'));
+    }
+
+    #[TestDox('管理者はゲスト向けに開けた画面（検索・投稿詳細）も開けない')]
+    public function test_admin_can_not_access_public_pages(): void
+    {
+        $goal = GoalPost::factory()->create();
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get(route('posts.search'))->assertForbidden();
+        $this->actingAs($admin)->get(route('posts.show', ['type' => 'goal', 'id' => $goal->id]))->assertForbidden();
     }
 
     #[TestDox('一般ユーザーはホームを開ける')]

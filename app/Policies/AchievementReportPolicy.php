@@ -10,7 +10,7 @@ use App\Models\User;
 class AchievementReportPolicy
 {
     // 投稿閲覧は誰でも閲覧可能
-    public function view(User $user): bool
+    public function view(?User $user): bool
     {
         return true;
     }

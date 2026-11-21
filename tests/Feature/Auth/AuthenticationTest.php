@@ -29,15 +29,29 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    #[TestDox('管理者はログイン後に管理画面に移る')]
-    public function test_admin_is_redirected_to_admin_dashboard_after_login(): void
+    #[TestDox('管理者は一般ユーザーのログイン画面からはログインできず、ユーザーがいないときと同じエラーになる')]
+    public function test_admin_can_not_login_from_general_login(): void
     {
         $admin = User::factory()->admin()->create();
 
         $this->post('/login', ['email' => $admin->email, 'password' => 'password'])
-            ->assertRedirect(route('admin.dashboard', absolute: false));
+            ->assertSessionHasErrors(['email' => '認証に失敗しました。']);
 
-        $this->assertAuthenticatedAs($admin);
+        $this->post('/login', ['email' => 'nobody@example.com', 'password' => 'password'])
+            ->assertSessionHasErrors(['email' => '認証に失敗しました。']);
+
+        $this->assertGuest();
+    }
+
+    #[TestDox('ログイン画面・新規登録画面に管理者用の画面へのリンクを出さない')]
+    public function test_general_auth_screens_do_not_link_to_admin_auth(): void
+    {
+        foreach (['/login', '/register'] as $path) {
+            $this->get($path)
+                ->assertOk()
+                ->assertDontSee(route('admin.login'), false)
+                ->assertDontSee(route('admin.register'), false);
+        }
     }
 
     #[TestDox('パスワードが違うとログインできない')]

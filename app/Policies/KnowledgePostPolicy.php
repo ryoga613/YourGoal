@@ -8,7 +8,7 @@ use App\Models\User;
 class KnowledgePostPolicy
 {
     // 知識投稿の閲覧はログインユーザーなら誰でも可能
-    public function view(User $user): bool
+    public function view(?User $user): bool
     {
         return true;
     }
