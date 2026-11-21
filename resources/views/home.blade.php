@@ -68,7 +68,7 @@
                     <p class="post-body">{{ \Illuminate\Support\Str::limit($body, 240) }}</p>
                 </a>
                 @if(data_get($post, 'image_path'))
-                    <img class="post-image" src="{{ asset('storage/'.data_get($post, 'image_path')) }}" alt="投稿画像">
+                    <img class="post-image post-image-fit" src="{{ asset('storage/'.data_get($post, 'image_path')) }}" alt="投稿画像">
                 @elseif(data_get($post, 'demo_image'))
                     <div class="post-image">投稿に関連するイメージ</div>
                 @endif

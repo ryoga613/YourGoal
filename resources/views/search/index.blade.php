@@ -46,6 +46,13 @@
                         @endif
                         <p class="post-body">{{ \Illuminate\Support\Str::limit($post->body, 180) }}</p>
                     </a>
+                    
+                    @if(data_get($post, 'image_path'))
+                        <img class="post-image post-image-fit" src="{{ asset('storage/'.data_get($post, 'image_path')) }}" alt="投稿画像">
+                    @elseif(data_get($post, 'demo_image'))
+                        <div class="post-image">投稿に関連するイメージ</div>
+                    @endif
+
                 </article>
             @empty
                 @if ($keyword !== null || request()->filled('type'))
