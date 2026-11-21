@@ -36,7 +36,7 @@
             <h1 class="post-title" style="font-size:24px">{{ data_get($post,'title','投稿タイトル') }}</h1>
             <p class="post-body">{{ data_get($post,'body',data_get($post,'content','')) }}</p>
             @if(data_get($post,'image_path'))
-                <img class="post-image" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">
+                <img class="post-image post-image-fit" src="{{ asset('storage/'.data_get($post,'image_path')) }}" alt="投稿画像">
             @endif
             {{-- 進捗報告・達成報告は、どの目標の報告かが分かるように元の目標宣言へのリンクを出す --}}
             @if(in_array($post->postType(), [\App\Enums\PostType::Progress, \App\Enums\PostType::Achievement], true) && $post->goal_post)

@@ -391,6 +391,17 @@
             font-weight: 700;
         }
 
+        /* 投稿画像を切り取らず、縦横比のまま表示する（ホーム・検索・投稿詳細）
+           縦長の画像も全体が画面に収まるよう、高さは画面の80%までにし、横幅が余るときは中央に置く */
+        img.post-image-fit {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            max-height: 80vh;
+            margin-inline: auto;
+        }
+
         .post-footer {
             display: flex;
             gap: 22px;
