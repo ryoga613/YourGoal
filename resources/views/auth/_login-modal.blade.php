@@ -7,7 +7,7 @@
     <div class="auth-card">
         <button class="login-modal-close" type="button" data-close-login-modal aria-label="閉じる">×</button>
         <h1 id="login-modal-title">ログインが必要です</h1>
-        <p class="subheading">この機能を使うには、ログインしてください。</p>
+        <p class="subheading">ログインして、共有をはじめよう。</p>
         {{-- login_modal を送り返してもらい、ログインに失敗して戻ってきたときにモーダルを開き直す --}}
         @if(old('login_modal') && $errors->any())<div class="alert">{{ $errors->first() }}</div>@endif
         <form method="POST" action="{{ route('login.store') }}">
