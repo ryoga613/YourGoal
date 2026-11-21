@@ -110,7 +110,7 @@
         <section class="form-card" id="comments">
             @if (session('status'))<div class="flash">{{ session('status') }}</div>@endif
             <h2 style="font-size:17px;margin-top:0">コメントする</h2>
-            <form method="POST" action="{{ route('comments.store', ['type' => request()->route('type'), 'id' => $post->id]) }}">
+            <form data-requires-login method="POST" action="{{ route('comments.store', ['type' => request()->route('type'), 'id' => $post->id]) }}">
                 @csrf
                 <div class="form-group">
                     {{-- 返信・編集フォームで失敗したときの入力値は、そちらのフォームに戻す --}}

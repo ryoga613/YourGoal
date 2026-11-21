@@ -2,7 +2,7 @@
 @section('title', '投稿を探す')
 @section('content')
 <div class="page-shell" style="grid-template-columns:220px minmax(0,1fr)">
-    <aside class="sidebar"><a class="nav-link" href="{{ url('/') }}"><span class="nav-icon">⌂</span><span>ホーム</span></a><a class="nav-link active" href="{{ url('/search') }}"><span class="nav-icon">⌕</span><span>投稿を探す</span></a><a class="nav-link" href="{{ url('/posts/create') }}"><span class="nav-icon">＋</span><span>投稿を作成</span></a></aside>
+    <aside class="sidebar"><a class="nav-link" href="{{ url('/') }}"><span class="nav-icon">⌂</span><span>ホーム</span></a><a class="nav-link active" href="{{ url('/search') }}"><span class="nav-icon">⌕</span><span>投稿を探す</span></a><a class="nav-link" href="{{ url('/posts/create') }}" data-requires-login><span class="nav-icon">＋</span><span>投稿を作成</span></a></aside>
     <main>
         <div class="page-heading"><div><h1>気になる投稿を探そう</h1><p class="subheading">キーワードや投稿種類から、あなたの興味に合う投稿を見つけましょう。</p></div></div>
         <form class="form-card" method="GET" action="{{ route('posts.search') }}">

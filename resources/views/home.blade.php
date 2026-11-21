@@ -5,30 +5,30 @@
     <aside class="sidebar">
         <div class="side-label">MENU</div>
         <a class="nav-link active" href="{{ \Illuminate\Support\Facades\Route::has('home') ? route('home') : url('/') }}"><span class="nav-icon">⌂</span><span>ホーム</span></a>
-        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}"><span class="nav-icon">＋</span><span>投稿を作成</span></a>
+        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}" data-requires-login><span class="nav-icon">＋</span><span>投稿を作成</span></a>
         <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('posts.search') ? route('posts.search') : url('/search') }}"><span class="nav-icon">⌕</span><span>投稿を探す</span></a>
         <div class="side-label">POST CATEGORY</div>
-        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('goals.create') ? route('goals.create') : url('/goals/create') }}"><span class="nav-icon">◎</span><span>目標宣言</span></a>
-        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('knowledge-posts.create') ? route('knowledge-posts.create') : url('/knowledge-posts/create') }}"><span class="nav-icon">✦</span><span>学び・知識共有</span></a>
+        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('goals.create') ? route('goals.create') : url('/goals/create') }}" data-requires-login><span class="nav-icon">◎</span><span>目標宣言</span></a>
+        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('knowledge-posts.create') ? route('knowledge-posts.create') : url('/knowledge-posts/create') }}" data-requires-login><span class="nav-icon">✦</span><span>学び・知識共有</span></a>
         <div class="side-label">MY PAGE</div>
         @auth
         <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('users.show') ? route('users.show', auth()->id()) : url('/users/'.auth()->id()) }}"><span class="nav-icon">♙</span><span>マイプロフィール</span></a>
         @endauth
-        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : url('/profile/edit') }}"><span class="nav-icon">⚙</span><span>プロフィール設定</span></a>
+        <a class="nav-link" href="{{ \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : url('/profile/edit') }}" data-requires-login><span class="nav-icon">⚙</span><span>プロフィール設定</span></a>
     </aside>
 
     <main class="main-column">
         <div class="page-heading">
             <div><h1>みんなの一歩を見てみよう</h1><p class="subheading">誰かの挑戦が、あなたの次の一歩になる。</p></div>
-            <a class="btn btn-primary" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}">＋ 投稿する</a>
+            <a class="btn btn-primary" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}" data-requires-login>＋ 投稿する</a>
         </div>
         <div class="composer">
             <x-avatar :user="auth()->user()" />
             <div style="flex:1">
-                <a class="composer-prompt" style="display:block" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}">今、取り組んでいることは？</a>
+                <a class="composer-prompt" style="display:block" href="{{ \Illuminate\Support\Facades\Route::has('posts.create') ? route('posts.create') : url('/posts/create') }}" data-requires-login>今、取り組んでいることは？</a>
                 <div class="composer-actions">
-                    <a class="btn btn-light" href="{{ \Illuminate\Support\Facades\Route::has('goals.create') ? route('goals.create') : url('/goals/create') }}">◎ 目標を宣言</a>
-                    <a class="btn btn-outline" href="{{ \Illuminate\Support\Facades\Route::has('knowledge-posts.create') ? route('knowledge-posts.create') : url('/knowledge-posts/create') }}">✦ 学びを共有</a>
+                    <a class="btn btn-light" href="{{ \Illuminate\Support\Facades\Route::has('goals.create') ? route('goals.create') : url('/goals/create') }}" data-requires-login>◎ 目標を宣言</a>
+                    <a class="btn btn-outline" href="{{ \Illuminate\Support\Facades\Route::has('knowledge-posts.create') ? route('knowledge-posts.create') : url('/knowledge-posts/create') }}" data-requires-login>✦ 学びを共有</a>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
                 </div>
             </article>
         @empty
-            <div class="empty-state"><h3>まだ投稿がありません</h3><p>最初の一歩を投稿して、コミュニティを始めましょう。</p><a class="btn btn-primary" href="{{ url('/posts/create') }}">投稿を作成する</a></div>
+            <div class="empty-state"><h3>まだ投稿がありません</h3><p>最初の一歩を投稿して、コミュニティを始めましょう。</p><a class="btn btn-primary" href="{{ url('/posts/create') }}" data-requires-login>投稿を作成する</a></div>
         @endforelse
         @if(isset($posts) && method_exists($posts, 'links'))
             <div style="margin-top:20px">{{ $posts->links() }}</div>
@@ -100,7 +100,7 @@
         <section class="rightbar-section">
             <h3>✨ はじめての投稿</h3>
             <p style="color:var(--muted)">目標や学びをシェアして、みんなと成長しよう。</p>
-            <a class="btn btn-primary btn-block" href="{{ url('/posts/create') }}">投稿を作成</a>
+            <a class="btn btn-primary btn-block" href="{{ url('/posts/create') }}" data-requires-login>投稿を作成</a>
         </section>
     </aside>
 </div>
