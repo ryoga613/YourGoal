@@ -11,7 +11,7 @@ class ProgressReportPolicy
     /**
      * 投稿の閲覧は誰でも可能
      */
-    public function view(User $user): bool
+    public function view(?User $user): bool
     {
         return true;
     }

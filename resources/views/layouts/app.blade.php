@@ -813,7 +813,7 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="{{ auth()->check() ? auth()->user()->role->homePath() : route('login') }}"><span class="brand-mark">Y</span>YourGoal</a>
+    <a class="brand" href="{{ auth()->check() ? auth()->user()->role->homePath() : route('home') }}"><span class="brand-mark">Y</span>YourGoal</a>
     {{-- 検索は一般ユーザー向けの機能のため、管理者には表示しない --}}
     @unless(auth()->user()?->isAdmin())
     <form class="top-search" method="GET" action="{{ \Illuminate\Support\Facades\Route::has('posts.search') ? route('posts.search') : url('/search') }}">

@@ -35,15 +35,20 @@ Route::middleware('guest:'.config('fortify.guard'))->prefix('admin')->name('admi
 Route::pattern('type', 'goal|progress|achievement|knowledge');
 Route::pattern('id', '[0-9]+');
 
-// 一般ユーザー向け（管理者はアクセス不可）
-Route::middleware(['auth', 'general'])->group(function () {
+// 閲覧はゲストもできる（管理者はアクセス不可）
+Route::middleware('general')->group(function () {
     // ホーム・検索
     Route::get('/', [FeedController::class, 'index'])->name('home');
     Route::get('/search', [SearchController::class, 'index'])->name('posts.search');
 
+    // 投稿詳細
+    Route::get('/posts/{type}/{id}', [PostController::class, 'show'])->name('posts.show');
+});
+
+// 一般ユーザー向け（ログイン必須・管理者はアクセス不可）
+Route::middleware(['auth', 'general'])->group(function () {
     // 投稿共通
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::get('/posts/{type}/{id}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/posts/{type}/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::patch('/posts/{type}/{id}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{type}/{id}', [PostController::class, 'destroy'])->name('posts.destroy');

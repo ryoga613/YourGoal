@@ -8,7 +8,7 @@ use App\Models\User;
 class GoalPostPolicy
 {
     // 目標宣言は誰でも閲覧可能
-    public function view(User $user): bool
+    public function view(?User $user): bool
     {
         return true;
     }
