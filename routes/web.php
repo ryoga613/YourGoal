@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AchievementReportController;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\Auth\RegisteredAdminController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\FeedController;
@@ -14,8 +15,21 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressReportController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
-// 認証（登録・ログイン・ログアウト）のルートは Fortify が登録する
+// 一般ユーザーの認証（登録・ログイン・ログアウト）のルートは Fortify が登録する
+
+// 管理者の認証（ログイン・新規登録）。一般ユーザー向けの画面からはリンクしない
+Route::middleware('guest:'.config('fortify.guard'))->prefix('admin')->name('admin.')->group(function () {
+    Route::view('/login', 'admin.auth.login')->name('login');
+    // ログイン処理は Fortify のものを使い、役割の確認は FortifyServiceProvider の authenticateUsing で行う
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:'.config('fortify.limiters.login'))
+        ->name('login.store');
+
+    Route::get('/register', [RegisteredAdminController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredAdminController::class, 'store'])->name('register.store');
+});
 
 // 投稿種類（/posts/{type}/{id}）は4種類に限定し、それ以外は404にする
 Route::pattern('type', 'goal|progress|achievement|knowledge');
