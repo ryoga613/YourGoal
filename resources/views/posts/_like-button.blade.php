@@ -7,7 +7,7 @@
 --}}
 @if ($id)
     {{-- いいね済みなら解除（DELETE）、まだなら登録（POST）。同じURLでメソッドだけ切り替える --}}
-    <form method="POST" action="{{ route($liked ? 'likes.destroy' : 'likes.store', ['type' => $type, 'id' => $id]) }}" style="display:inline">
+    <form data-requires-login method="POST" action="{{ route($liked ? 'likes.destroy' : 'likes.store', ['type' => $type, 'id' => $id]) }}" style="display:inline">
         @csrf
         @if ($liked)
             @method('DELETE')

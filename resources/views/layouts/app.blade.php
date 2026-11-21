@@ -517,6 +517,35 @@
             margin-top: 20px;
         }
 
+        /* ゲスト向けのログインモーダル（auth/_login-modal） */
+        .login-modal {
+            border: 0;
+            padding: 0;
+            background: transparent;
+            width: min(calc(100% - 32px), 440px);
+            max-width: none;
+        }
+
+        .login-modal::backdrop {
+            background: rgba(32, 36, 58, .45);
+        }
+
+        .login-modal .auth-card {
+            position: relative;
+            width: 100%;
+        }
+
+        .login-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 20px;
+            line-height: 1;
+        }
+
         .alert {
             padding: 12px 14px;
             background: #fff0f0;
@@ -841,6 +870,12 @@
     </div>
 </header>
 @yield('content')
+{{-- ゲストがログインの必要な機能を使おうとしたときに開くモーダル（ログイン・新規登録の画面では出さない） --}}
+@guest
+    @unless(request()->routeIs('login', 'register', 'admin.login', 'admin.register'))
+        @include('auth._login-modal')
+    @endunless
+@endguest
 <footer class="footer">© {{ date('Y') }} YourGoal — 小さな一歩を、みんなの成長に。</footer>
 <script>
     // ブラウザ標準の入力チェック（required / type="email" / minlength）のメッセージを日本語で統一する
@@ -867,6 +902,39 @@
             event.target.setCustomValidity('');
         }
     });
+
+    // ゲスト向けログインモーダル（auth/_login-modal）
+    // data-requires-login を付けたリンク・フォームは、ゲストのときだけ画面遷移を止めてモーダルを開く
+    const loginModal = document.getElementById('login-modal');
+    if (loginModal) {
+        const openLoginModal = () => {
+            loginModal.showModal();
+            loginModal.querySelector('input[name="email"]').focus();
+        };
+
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('a[data-requires-login]')) {
+                event.preventDefault();
+                openLoginModal();
+            }
+            // ×ボタン、またはモーダルの外側（背景）を押したら閉じる
+            if (event.target.closest('[data-close-login-modal]') || event.target === loginModal) {
+                loginModal.close();
+            }
+        });
+
+        document.addEventListener('submit', (event) => {
+            if (event.target.matches('form[data-requires-login]')) {
+                event.preventDefault();
+                openLoginModal();
+            }
+        });
+
+        // ログインに失敗して戻ってきたときは、エラーを見せるために開き直す
+        @if(old('login_modal'))
+            openLoginModal();
+        @endif
+    }
 
     // シェアボタン（posts/_share-button）：端末の共有メニューを開く（使えないブラウザでは URL をコピーする）
     document.addEventListener('click', async (event) => {

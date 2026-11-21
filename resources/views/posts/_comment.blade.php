@@ -22,7 +22,7 @@
 
             <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-bottom:12px">
                 {{-- いいね済みなら解除（DELETE）、まだなら登録（POST）。同じURLでメソッドだけ切り替える --}}
-                <form method="POST" action="{{ route($comment->liked ? 'comment-likes.destroy' : 'comment-likes.store', $comment) }}">
+                <form data-requires-login method="POST" action="{{ route($comment->liked ? 'comment-likes.destroy' : 'comment-likes.store', $comment) }}">
                     @csrf
                     @if ($comment->liked)
                         @method('DELETE')
@@ -35,7 +35,7 @@
 
                 <details @if ($isReplyTarget) open @endif>
                     <summary class="post-meta" style="cursor:pointer">返信する</summary>
-                    <form method="POST" action="{{ route('comments.reply', $comment) }}" style="margin-top:8px">
+                    <form data-requires-login method="POST" action="{{ route('comments.reply', $comment) }}" style="margin-top:8px">
                         @csrf
                         <input type="hidden" name="reply_to" value="{{ $comment->id }}">
                         <textarea class="form-control" name="body" rows="2" maxlength="1000" placeholder="{{ $comment->user?->name ?? 'このコメント' }}さんに返信" required>{{ $isReplyTarget ? old('body') : '' }}</textarea>
