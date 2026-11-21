@@ -13,6 +13,6 @@
         <div class="form-group"><label for="password_confirmation">パスワード（確認）</label><input class="form-control" id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required></div>
         <button class="btn btn-primary btn-block" type="submit">アカウントを作成</button>
     </form>
-    <div class="auth-foot">すでにアカウントをお持ちの方は <a style="color:var(--blue);font-weight:800" href="{{ route('login') }}">ログイン</a></div>
+    <div class="auth-foot">すでにアカウントをお持ちの方は <a style="color:var(--accent);font-weight:800" href="{{ route('login') }}">ログイン</a></div>
 </div></div>
 @endsection
