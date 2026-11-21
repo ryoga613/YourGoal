@@ -4,18 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'YourGoal') | YourGoal</title>
+    <script>
+        // 夜（19時〜翌6時）は背景を黒・文字を白にする（見ている人の端末の時刻で判断する）
+        // 画面を描く前に決めておき、一瞬だけ白い画面が見えるのを防ぐため <head> の中で実行する
+        (() => {
+            const applyTheme = () => {
+                const hour = new Date().getHours();
+                document.documentElement.dataset.theme = (hour >= 19 || hour < 6) ? 'night' : 'day';
+            };
+            applyTheme();
+            setInterval(applyTheme, 60 * 1000); // 開いたまま19時・6時をまたいでも、1分以内に切り替える
+        })();
+    </script>
+    {{-- 柔らかい明朝体（Zen Old Mincho）を Google Fonts から読み込む。用意されている太さは 400 / 500 / 600 / 700 / 900 --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
+        /* 基本カラーは黒、アクセントカラーはオレンジ。グレーは黒とオレンジになじむよう少し暖かみのある色にする
+           色はすべてここの変数で指定し、夜（html[data-theme="night"]）は変数の値だけを入れ替える */
         :root {
-            --blue: #3563e9;
-            --blue-dark: #244bc0;
-            --ink: #20243a;
-            --muted: #737b91;
-            --line: #e9ecf3;
-            --bg: #f6f8fc;
+            --primary: #1c1b1a;        /* 基本の黒（文字・主ボタン） */
+            --primary-hover: #3a3836;
+            --on-primary: #fff;        /* 主ボタンの上の文字 */
+            --accent: #d9620f;         /* アクセントのオレンジ（リンク・選択中・フォーカス） */
+            --accent-soft: #fff1e6;    /* オレンジの薄い背景 */
+            --ink: var(--primary);
+            --text-soft: #4f4a45;      /* 投稿の本文 */
+            --text-sub: #5a554f;       /* メニューの文字 */
+            --muted: #6f6a64;          /* 補足の文字 */
+            --faint: #a39d96;          /* さらに薄い文字（見出しラベル・フッター） */
+            --disabled: #c4bfb9;
+            --line: #ebe8e4;
+            --line-strong: #e0dcd7;    /* 入力欄の枠 */
+            --bg: #f7f6f4;             /* ページの背景 */
+            --surface: #fff;           /* カード・ヘッダー・入力欄の背景 */
+            --surface-sunken: #faf9f7; /* 一段沈んだ背景（検索欄・表の見出し） */
+            --chip: #f0ede9;           /* アバター・タグの背景 */
+            --image-from: #f3eee8;     /* 画像がない投稿のイメージ枠 */
+            --image-to: #fbe7d8;
+            --image-text: #8a7b6c;
             --white: #fff;
             --green: #16856b;
             --orange: #c97822;
             --pink: #b24b87;
+        }
+
+        /* 夜（19時〜翌6時）：背景を黒、文字を白にする。どの時間帯かは <head> のスクリプトが決める */
+        html[data-theme="night"] {
+            color-scheme: dark;        /* スクロールバーや入力欄の部品もブラウザの暗い見た目にする */
+            --primary: #f3f0eb;
+            --primary-hover: #d9d4cd;
+            --on-primary: #1c1b1a;
+            --accent: #f08a3e;         /* 黒い背景でも読めるよう、昼より明るいオレンジ */
+            --accent-soft: rgba(240, 138, 62, .16);
+            --text-soft: #d6d1ca;
+            --text-sub: #c4bfb9;
+            --muted: #a39d96;
+            --faint: #7d7770;
+            --disabled: #5a554f;
+            --line: #34312e;
+            --line-strong: #45413d;
+            --bg: #121110;
+            --surface: #1c1b1a;
+            --surface-sunken: #24221f;
+            --chip: #2c2a27;
+            --image-from: #2a2622;
+            --image-to: #3a2a1e;
+            --image-text: #b8a894;
         }
 
 
@@ -27,7 +83,8 @@
             margin: 0;
             background: var(--bg);
             color: var(--ink);
-            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+            /* 柔らかい明朝体。Zen Old Mincho を読み込めないときは、端末に入っている明朝体（Mac: ヒラギノ明朝、Windows: 游明朝）を使う */
+            font-family: "Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",YuMincho,serif;
             font-size: 14px;
             line-height: 1.65;
         }
@@ -60,22 +117,22 @@
 
 
         .btn-primary {
-            background: var(--blue);
-            color: #fff;
+            background: var(--primary);
+            color: var(--on-primary);
         }
 
         .btn-primary:hover {
-            background: var(--blue-dark);
+            background: var(--primary-hover);
         }
 
         .btn-light {
-            background: #eef2ff;
-            color: var(--blue);
+            background: var(--accent-soft);
+            color: var(--accent);
         }
 
         .btn-outline {
             border: 1px solid var(--line);
-            background: #fff;
+            background: var(--surface);
             color: var(--ink);
         }
 
@@ -86,7 +143,7 @@
 
         .topbar {
             height: 72px;
-            background: #fff;
+            background: var(--surface);
             border-bottom: 1px solid var(--line);
             position: sticky;
             top: 0;
@@ -102,14 +159,14 @@
             font-size: 24px;
             font-weight: 850;
             letter-spacing: -1px;
-            color: var(--blue);
+            color: var(--primary);
             white-space: nowrap;
         }
 
         .brand-mark {
             display: inline-grid;
             place-items: center;
-            background: var(--blue);
+            background: var(--accent);
             color: white;
             width: 30px;
             height: 30px;
@@ -130,7 +187,7 @@
             border: 1px solid var(--line);
             border-radius: 12px;
             padding: 12px 15px 12px 42px;
-            background: #f8f9fc;
+            background: var(--surface-sunken);
             outline: none;
         }
 
@@ -154,8 +211,8 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: #e6ebff;
-            color: var(--blue);
+            background: var(--chip);
+            color: var(--primary);
             display: inline-grid;
             place-items: center;
             font-weight: 800;
@@ -182,7 +239,7 @@
         .post-card,
         .form-card,
         .auth-card {
-            background: #fff;
+            background: var(--surface);
             border: 1px solid var(--line);
             border-radius: 16px;
         }
@@ -196,7 +253,7 @@
         .side-label {
             font-size: 11px;
             font-weight: 800;
-            color: #9aa1b2;
+            color: var(--faint);
             letter-spacing: 1px;
             padding: 10px 10px 7px;
         }
@@ -207,15 +264,15 @@
             gap: 12px;
             padding: 11px 12px;
             border-radius: 10px;
-            color: #5e667c;
+            color: var(--text-sub);
             font-weight: 650;
             margin: 2px 0;
         }
 
         .nav-link.active,
         .nav-link:hover {
-            background: #eef2ff;
-            color: var(--blue);
+            background: var(--accent-soft);
+            color: var(--accent);
         }
 
         .nav-icon {
@@ -253,8 +310,8 @@
             padding: 4px 8px;
             font-size: 11px;
             font-weight: 800;
-            background: #eef2ff;
-            color: var(--blue);
+            background: var(--chip);
+            color: var(--primary);
         }
 
         .tag.goal {
@@ -313,13 +370,13 @@
         }
 
         .tab.active {
-            color: var(--blue);
-            border-color: var(--blue);
+            color: var(--primary);
+            border-color: var(--accent);
         }
 
 
         .composer {
-            background: #fff;
+            background: var(--surface);
             border: 1px solid var(--line);
             border-radius: 16px;
             padding: 16px;
@@ -334,8 +391,8 @@
             border: 1px solid var(--line);
             border-radius: 12px;
             padding: 12px 14px;
-            color: #9aa1b2;
-            background: #fafbfe;
+            color: var(--faint);
+            background: var(--surface-sunken);
         }
 
         .composer-actions {
@@ -374,7 +431,7 @@
         }
 
         .post-body {
-            color: #555e73;
+            color: var(--text-soft);
             white-space: pre-line;
         }
 
@@ -382,12 +439,12 @@
             width: 100%;
             height: 220px;
             object-fit: cover;
-            background: linear-gradient(135deg,#dfe8ff,#f5e8ff);
+            background: linear-gradient(135deg,var(--image-from),var(--image-to));
             border-radius: 12px;
             margin-top: 14px;
             display: grid;
             place-items: center;
-            color: #6979b2;
+            color: var(--image-text);
             font-weight: 700;
         }
 
@@ -408,7 +465,7 @@
             border-top: 1px solid var(--line);
             padding-top: 13px;
             margin-top: 16px;
-            color: #737b91;
+            color: var(--muted);
         }
 
         .post-action {
@@ -419,7 +476,7 @@
         }
 
         .post-action:hover {
-            color: var(--blue);
+            color: var(--accent);
         }
 
 
@@ -439,16 +496,16 @@
 
         .form-control {
             width: 100%;
-            border: 1px solid #dfe3ec;
+            border: 1px solid var(--line-strong);
             border-radius: 10px;
             padding: 12px 13px;
-            background: #fff;
+            background: var(--surface);
             outline: none;
         }
 
         .form-control:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px #3563e91a;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px #d9620f26;
         }
 
         .form-help {
@@ -480,13 +537,13 @@
             padding: 18px;
             border: 1px solid var(--line);
             border-radius: 13px;
-            background: #fff;
+            background: var(--surface);
             display: block;
         }
 
         .choice-card:hover {
-            border-color: var(--blue);
-            background: #f8f9ff;
+            border-color: var(--accent);
+            background: var(--accent-soft);
         }
 
         .choice-card strong {
@@ -538,7 +595,7 @@
         }
 
         .login-modal::backdrop {
-            background: rgba(32, 36, 58, .45);
+            background: rgba(28, 27, 26, .5);
         }
 
         .login-modal .auth-card {
@@ -569,8 +626,8 @@
             text-align: center;
             padding: 50px 20px;
             color: var(--muted);
-            background: #fff;
-            border: 1px dashed #dce1eb;
+            background: var(--surface);
+            border: 1px dashed var(--line-strong);
             border-radius: 16px;
         }
 
@@ -589,7 +646,7 @@
 
         .stat-card {
             padding: 20px;
-            background: #fff;
+            background: var(--surface);
             border: 1px solid var(--line);
             border-radius: 15px;
         }
@@ -650,7 +707,7 @@
 
 
         .table-wrap {
-            background: #fff;
+            background: var(--surface);
             border: 1px solid var(--line);
             border-radius: 16px;
             overflow-x: auto;
@@ -673,7 +730,7 @@
         .admin-table th {
             font-size: 12px;
             color: var(--muted);
-            background: #fafbfe;
+            background: var(--surface-sunken);
             white-space: nowrap;
         }
 
@@ -713,18 +770,18 @@
             padding: 7px 10px;
             border: 1px solid var(--line);
             border-radius: 8px;
-            background: #fff;
+            background: var(--surface);
         }
 
         .pagination .active>span,
         .pagination .active .page-link {
-            background: var(--blue);
-            border-color: var(--blue);
-            color: #fff;
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--on-primary);
         }
 
         .pagination .disabled .page-link {
-            color: #c0c5d1;
+            color: var(--disabled);
         }
 
 
@@ -752,7 +809,7 @@
 
         .footer {
             text-align: center;
-            color: #a0a6b5;
+            color: var(--faint);
             padding: 28px;
             font-size: 12px;
         }

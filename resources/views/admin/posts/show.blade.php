@@ -29,7 +29,7 @@
                 <dt>関連する報告</dt><dd>進捗報告 {{ number_format($post->progress_reports_count) }}件 / 達成報告 {{ number_format($post->achievement_reports_count) }}件</dd>
             @elseif($post->goal_post)
                 <dt>対象の目標</dt>
-                <dd><a style="color:var(--blue);font-weight:700" href="{{ route('admin.posts.show', ['type' => 'goal', 'id' => $post->goal_post->id]) }}">{{ $post->goal_post->title }}</a></dd>
+                <dd><a style="color:var(--accent);font-weight:700" href="{{ route('admin.posts.show', ['type' => 'goal', 'id' => $post->goal_post->id]) }}">{{ $post->goal_post->title }}</a></dd>
             @endif
             <dt>いいね</dt><dd>{{ number_format($post->post_likes_count) }}</dd>
             <dt>投稿日時</dt><dd>{{ $post->created_at->format('Y/m/d H:i') }}</dd>

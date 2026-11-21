@@ -17,14 +17,14 @@
             <dd>
                 @if($postType && $post)
                     <span class="tag {{ $postType->tagClass() }}">{{ $postType->label() }}</span>
-                    <a style="color:var(--blue);font-weight:700" href="{{ route('admin.posts.show', ['type' => $postType->value, 'id' => $post->id]) }}">{{ $post->title ?? '（タイトルなし）' }}</a>
+                    <a style="color:var(--accent);font-weight:700" href="{{ route('admin.posts.show', ['type' => $postType->value, 'id' => $post->id]) }}">{{ $post->title ?? '（タイトルなし）' }}</a>
                 @else
                     <span class="text-muted">—</span>
                 @endif
             </dd>
             @if($comment->parent)
                 <dt>返信先</dt>
-                <dd><a style="color:var(--blue)" href="{{ route('admin.comments.show', $comment->parent) }}">{{ $comment->parent->user->name }}：{{ \Illuminate\Support\Str::limit($comment->parent->body, 60) }}</a></dd>
+                <dd><a style="color:var(--accent)" href="{{ route('admin.comments.show', $comment->parent) }}">{{ $comment->parent->user->name }}：{{ \Illuminate\Support\Str::limit($comment->parent->body, 60) }}</a></dd>
             @endif
             <dt>いいね</dt><dd>{{ number_format($comment->comment_likes_count) }}</dd>
             <dt>投稿日時</dt><dd>{{ $comment->created_at->format('Y/m/d H:i') }}</dd>
