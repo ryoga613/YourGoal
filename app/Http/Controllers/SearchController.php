@@ -66,10 +66,11 @@ class SearchController extends Controller
         $like = '%'.addcslashes($keyword, '\\%_').'%';
 
         // OR 条件は必ず where(function...) で囲む。囲まないと、あとから AND 条件を足したときに絞り込みが効かなくなる
+        // whereLike は大文字・小文字を区別しない（PostgreSQL では ILIKE になる）ので、MySQL でも PostgreSQL でも同じ結果になる
         return $query->where(function (Builder $q) use ($like) {
-            $q->where('title', 'like', $like)
-                ->orWhere('body', 'like', $like)
-                ->orWhereHas('user', fn (Builder $u) => $u->where('name', 'like', $like));
+            $q->whereLike('title', $like)
+                ->orWhereLike('body', $like)
+                ->orWhereHas('user', fn (Builder $u) => $u->whereLike('name', $like));
         });
     }
 }

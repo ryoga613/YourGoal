@@ -49,13 +49,13 @@ class PostController extends Controller
                 $pattern = '%'.$this->escapeLike($keyword).'%';
 
                 $query->where(function ($q) use ($pattern) {
-                    $q->where('title', 'like', $pattern)
-                        ->orWhere('body', 'like', $pattern)
+                    $q->whereLike('title', $pattern)
+                        ->orWhereLike('body', $pattern)
                         // 投稿者の名前は users テーブルにあるため、users を user_id で探して検索する
                         ->orWhereIn('user_id', fn ($userQuery) => $userQuery
                             ->select('id')
                             ->from('users')
-                            ->where('name', 'like', $pattern));
+                            ->whereLike('name', $pattern));
                 });
             }
 
