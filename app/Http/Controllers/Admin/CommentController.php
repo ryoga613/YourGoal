@@ -37,8 +37,8 @@ class CommentController extends Controller
             $pattern = '%'.$this->escapeLike($keyword).'%';
 
             $commentsQuery->where(function (Builder $query) use ($pattern) {
-                $query->where('body', 'like', $pattern)
-                    ->orWhereHas('user', fn (Builder $q) => $q->where('name', 'like', $pattern));
+                $query->whereLike('body', $pattern)
+                    ->orWhereHas('user', fn (Builder $q) => $q->whereLike('name', $pattern));
             });
         }
 

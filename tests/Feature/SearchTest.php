@@ -59,6 +59,18 @@ class SearchTest extends TestCase
             ->assertSee('1件');
     }
 
+    #[TestDox('キーワードは大文字・小文字を区別せずにヒットする')]
+    public function test_keyword_is_case_insensitive(): void
+    {
+        KnowledgePost::factory()->create(['title' => 'Laravelの勉強法', 'body' => '本文']);
+
+        $this->actingAs($this->user)
+            ->get(route('posts.search', ['keyword' => 'laravel']))
+            ->assertOk()
+            ->assertSee('Laravelの勉強法')
+            ->assertSee('1件');
+    }
+
     #[TestDox('キーワードは本文にヒットする')]
     public function test_keyword_matches_body(): void
     {

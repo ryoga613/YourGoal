@@ -26,8 +26,8 @@ class UserController extends Controller
 
         if ($keyword) {
             $userQuery->where(function ($query) use ($keyword) {
-                $query->where('email', 'like', '%'.$this->escapeLike($keyword).'%')
-                    ->orWhere('name', 'like', '%'.$this->escapeLike($keyword).'%');
+                $query->whereLike('email', '%'.$this->escapeLike($keyword).'%')
+                    ->orWhereLike('name', '%'.$this->escapeLike($keyword).'%');
             });
         }
 
